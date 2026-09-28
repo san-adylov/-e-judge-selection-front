@@ -59,21 +59,22 @@ import { ContestProfileHintComponent } from './profile-hint.component';
         <app-contest-profile-hint />
       }
 
-      <div class="mt-auto grid grid-cols-1 gap-2 pt-1 tablet:grid-cols-2">
-        <p-button
-          icon="pi pi-info-circle"
-          severity="secondary"
-          styleClass="w-full"
-          [outlined]="true"
-          [label]="'contests.card.details' | lang"
-          [routerLink]="['/cabinet/contests', item.id]"
-        />
+      <!-- Кнопки друг под другом: подписи причин («Приём документов завершён») не помещаются в половину карточки. -->
+      <div class="mt-auto flex flex-col gap-2 pt-1">
         <app-contest-action-button
           [action]="action()"
           [applicationId]="applicationId()"
           [loading]="loading()"
           [disabled]="disabled()"
           (apply)="apply.emit()"
+        />
+        <p-button
+          icon="pi pi-info-circle"
+          severity="secondary"
+          styleClass="w-full"
+          [text]="true"
+          [label]="'contests.card.details' | lang"
+          [routerLink]="['/cabinet/contests', item.id]"
         />
       </div>
     </article>

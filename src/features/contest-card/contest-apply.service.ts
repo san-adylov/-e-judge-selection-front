@@ -3,36 +3,45 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LangService } from '@reforgium/presentia';
 import { ConfirmationService } from 'primeng/api';
-import { catchError, EMPTY, finalize, of, switchMap, throwError } from 'rxjs';
+import { catchError, EMPTY, finalize, map, type Observable, of, Subject, switchMap, tap } from 'rxjs';
 
 import type { Schemas } from '@domain/api/api.types';
 import { CandidateProfileApi } from '@domain/api/candidate-profile.api';
 import { ContestApplicationApi } from '@domain/api/contest-application.api';
-import { apiErrorOf, ERROR_CODES } from '@shared/api/api-error';
+import { apiErrorOf } from '@shared/api/api-error';
+import { skipErrorToast } from '@shared/api/http-context';
 import { backendLangOf } from '@shared/lib/language';
 import { NotifyService } from '@shared/ui/notify.service';
 
 import { buildApplicationDraft } from './application-draft';
 
-/** Коды отказа `SubmissionRules` бэкенда при создании черновика. */
+type Profile = Schemas['ProfileResponse'];
+
+/** Коды отказа `ApplicationSubmissionService.createDraft` бэкенда. */
 export const APPLY_ERRORS = {
+  /** Нет личных данных (даты рождения) для проверки возраста. */
   PROFILE_INCOMPLETE: 4137,
   BANNED: 4153,
   ALREADY_EXISTS: 4091,
   ACTIVE_SAME_TYPE: 4102,
+  EXPIRED: 4093,
+  NOT_STARTED: 4146,
+  NOT_PUBLISHED: 4321,
 } as const;
 
-function isNotFound(error: unknown): boolean {
-  return (
-    (error instanceof HttpErrorResponse && error.status === 404) ||
-    apiErrorOf(error)?.errorCode === ERROR_CODES.NOT_FOUND
-  );
-}
+/** После этих отказов данные на экране устарели — страница перечитывает конкурсы. */
+const STALE_ERRORS: ReadonlySet<number> = new Set([
+  APPLY_ERRORS.ALREADY_EXISTS,
+  APPLY_ERRORS.ACTIVE_SAME_TYPE,
+  APPLY_ERRORS.EXPIRED,
+  APPLY_ERRORS.NOT_STARTED,
+  APPLY_ERRORS.NOT_PUBLISHED,
+]);
 
 /**
- * Подача заявки на конкурс: подтверждение → проверка отстранения → черновик с контактами из профиля →
+ * Подача заявки на конкурс: подтверждение → проверка отстранения → черновик с контактами из личных данных →
  * мастер заявки `/cabinet/applications/:id/edit`. Провайдер уровня страницы: `providers: [ContestApplyService]`.
- * Ошибки бэкенда уже показаны тостом интерцептора; здесь — только реакция на них.
+ * Ошибки `create` уже показаны тостом интерцептора; здесь — только реакция на них.
  */
 @Injectable()
 export class ContestApplyService {
@@ -42,23 +51,27 @@ export class ContestApplyService {
   private readonly confirm = inject(ConfirmationService);
   private readonly lang = inject(LangService);
   private readonly notify = inject(NotifyService);
+  private readonly staleEvents = new Subject<void>();
 
+  /** Данные на экране устарели (отказ 4091, 4102 или по срокам приёма): страница перечитывает конкурсы. */
+  readonly stale = this.staleEvents.asObservable();
   readonly ban = signal<Schemas['BanStatusResponse'] | null>(null);
   readonly banned = computed(() => this.ban()?.banned === true);
   /** Конкурс, по которому сейчас создаётся заявка. */
   readonly pending = signal<number | null>(null);
-  /** Конкурс, для которого нужно дозаполнить личное дело (4137 или нет личных данных). */
+  /** Конкурс, для которого нужно заполнить личные данные (отказ 4137 или их ещё нет). */
   readonly profileHint = signal<number | null>(null);
 
+  /** Ошибка проверки не мешает работе: окончательно отстранение проверит бэкенд (4153). */
   loadBanStatus(): void {
-    this.profiles.banStatus().subscribe((ban) => this.ban.set(ban));
+    this.checkBan().subscribe();
   }
 
-  /** `onStale` — данные на экране устарели (заявка уже есть, 4091): страница перезагружает список. */
-  apply(contest: { id?: number; name?: string }, onStale?: () => void): void {
+  /** Подтверждение и создание черновика; после отказа 4091, 4102 или по срокам приёма срабатывает `stale`. */
+  apply(contest: { id?: number; name?: string }): void {
     const contestId = contest.id;
 
-    if (contestId === undefined || this.pending() !== null) return;
+    if (contestId === undefined || this.pending() !== null || this.banned()) return;
 
     this.confirm.confirm({
       header: this.lang.get('contests.apply.confirm-header'),
@@ -67,36 +80,28 @@ export class ContestApplyService {
       acceptLabel: this.lang.get('contests.apply.confirm-accept'),
       rejectLabel: this.lang.get('shell.actions.cancel'),
       rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.create(contestId, onStale),
+      accept: () => this.create(contestId),
     });
   }
 
-  private create(contestId: number, onStale?: () => void): void {
+  private create(contestId: number): void {
     this.pending.set(contestId);
     this.profileHint.set(null);
 
-    this.profiles
-      .banStatus()
+    this.checkBan()
       .pipe(
-        switchMap((ban) => {
-          this.ban.set(ban);
-
-          if (ban.banned) return EMPTY;
-
-          return this.profiles
-            .my()
-            .pipe(catchError((error) => (isNotFound(error) ? of(null) : throwError(() => error))));
-        }),
+        switchMap((banned) => (banned ? EMPTY : this.profile())),
         switchMap((profile) => {
-          if (!profile) {
+          if (profile === null) {
             this.profileHint.set(contestId);
 
             return EMPTY;
           }
 
-          const draft = buildApplicationDraft(profile, backendLangOf(this.lang.currentLang()));
-
-          return this.applications.create(contestId, draft);
+          return this.applications.create(
+            contestId,
+            buildApplicationDraft(profile, backendLangOf(this.lang.currentLang())),
+          );
         }),
         finalize(() => this.pending.set(null)),
       )
@@ -109,21 +114,38 @@ export class ContestApplyService {
               : ['/cabinet/applications', application.id, 'edit'],
           );
         },
-        error: (error: unknown) => this.onError(error, contestId, onStale),
+        error: (error: unknown) => this.onError(error, contestId),
       });
   }
 
-  private onError(error: unknown, contestId: number, onStale?: () => void): void {
-    switch (apiErrorOf(error)?.errorCode) {
-      case APPLY_ERRORS.PROFILE_INCOMPLETE:
-        this.profileHint.set(contestId);
-        break;
-      case APPLY_ERRORS.BANNED:
-        this.loadBanStatus();
-        break;
-      case APPLY_ERRORS.ALREADY_EXISTS:
-        onStale?.();
-        break;
-    }
+  /** `true` — кандидат отстранён; при ошибке запроса — `false`, решает бэкенд. */
+  private checkBan(): Observable<boolean> {
+    return this.profiles.banStatus(skipErrorToast()).pipe(
+      tap((ban) => this.ban.set(ban)),
+      map((ban) => ban.banned === true),
+      catchError(() => of(false)),
+    );
+  }
+
+  /**
+   * Личные данные для контактов черновика: `null` — ещё не заполнены (404) и бэкенд откажет 4137;
+   * `undefined` — загрузить не удалось, черновик создаётся без контактов (кандидат дополнит их в мастере).
+   */
+  private profile(): Observable<Profile | null | undefined> {
+    return this.profiles
+      .my(skipErrorToast())
+      .pipe(
+        catchError((error: unknown) =>
+          of(error instanceof HttpErrorResponse && error.status === 404 ? null : undefined),
+        ),
+      );
+  }
+
+  private onError(error: unknown, contestId: number): void {
+    const code = apiErrorOf(error)?.errorCode;
+
+    if (code === APPLY_ERRORS.PROFILE_INCOMPLETE) this.profileHint.set(contestId);
+    if (code === APPLY_ERRORS.BANNED) this.loadBanStatus();
+    if (code !== undefined && STALE_ERRORS.has(code)) this.staleEvents.next();
   }
 }

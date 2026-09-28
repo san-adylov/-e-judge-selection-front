@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, type HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
@@ -53,12 +53,14 @@ export class ContestApi {
     return this.http.put<Contest>(`${BASE}/${id}/stage-window/${stage}`, body);
   }
 
-  get(id: number): Observable<Contest> {
-    return this.http.get<Contest>(`${BASE}/${id}`);
+  /** Любому авторизованному (`@AuthenticatedAccess`). Для своей обработки 404 (40413) передайте `skipErrorToast()`. */
+  get(id: number, context?: HttpContext): Observable<Contest> {
+    return this.http.get<Contest>(`${BASE}/${id}`, { context });
   }
 
-  steps(id: number): Observable<S['ContestStepResponse'][]> {
-    return this.http.get<S['ContestStepResponse'][]>(`${BASE}/steps/${id}`);
+  /** Календарный план конкурса; любому авторизованному. */
+  steps(id: number, context?: HttpContext): Observable<S['ContestStepResponse'][]> {
+    return this.http.get<S['ContestStepResponse'][]>(`${BASE}/steps/${id}`, { context });
   }
 
   all(query: PageQuery = {}): Observable<Page<Contest>> {

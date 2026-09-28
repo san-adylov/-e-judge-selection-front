@@ -1,4 +1,15 @@
-import { acceptanceState, contestAction, isParticipating, serverToday } from './contest-action';
+import type { ContestType } from '@domain/api/api.types';
+
+import {
+  acceptanceState,
+  actionFor,
+  contestAction,
+  hasActiveInSameType,
+  isParticipating,
+  NO_PARTICIPATION,
+  participationOf,
+  serverToday,
+} from './contest-action';
 
 describe('acceptanceState', () => {
   const published = { status: 'PUBLISHED' as const, startDate: '2026-09-01', documentAcceptanceEndDate: '2026-10-01' };
@@ -39,29 +50,130 @@ describe('isParticipating', () => {
 });
 
 describe('contestAction', () => {
+  const open = { participating: false, acceptance: 'open' as const, banned: false };
+
   it('«Моя заявка», если заявка уже есть — независимо от сроков и отстранения', () => {
-    expect(contestAction({ participating: true, acceptance: 'closed', banned: true })).toEqual({ kind: 'application' });
+    expect(contestAction({ participating: true, acceptance: 'closed', banned: true, activeSameType: true })).toEqual({
+      kind: 'application',
+    });
   });
 
-  it('«Подать заявку» при открытом приёме без отстранения', () => {
-    expect(contestAction({ participating: false, acceptance: 'open', banned: false })).toEqual({ kind: 'apply' });
+  it('«Подать заявку» при открытом приёме без ограничений', () => {
+    expect(contestAction(open)).toEqual({ kind: 'apply' });
   });
 
   it('недоступно вне окна приёма', () => {
-    expect(contestAction({ participating: false, acceptance: 'not-started', banned: false })).toEqual({
+    expect(contestAction({ ...open, acceptance: 'not-started' })).toEqual({
       kind: 'unavailable',
       reason: 'not-started',
     });
-    expect(contestAction({ participating: false, acceptance: 'closed', banned: false })).toEqual({
+    expect(contestAction({ ...open, acceptance: 'closed' })).toEqual({ kind: 'unavailable', reason: 'closed' });
+  });
+
+  it('отстранение проверяется первым, как в createDraft (4153)', () => {
+    expect(contestAction({ ...open, banned: true })).toEqual({ kind: 'unavailable', reason: 'banned' });
+    expect(contestAction({ ...open, banned: true, acceptance: 'closed' })).toEqual({
       kind: 'unavailable',
-      reason: 'closed',
+      reason: 'banned',
     });
   });
 
-  it('недоступно при отстранении', () => {
-    expect(contestAction({ participating: false, acceptance: 'open', banned: true })).toEqual({
+  it('недоступно при активной заявке на конкурс того же типа (4102)', () => {
+    expect(contestAction({ ...open, activeSameType: true })).toEqual({
       kind: 'unavailable',
-      reason: 'banned',
+      reason: 'active-same-type',
+    });
+  });
+});
+
+describe('participationOf / hasActiveInSameType', () => {
+  const types = new Map<number, ContestType | null>([
+    [1, 'RESERVE'],
+    [2, 'RESERVE'],
+    [3, 'SUPREME_COURT'],
+    [4, null],
+    [5, null],
+  ]);
+
+  it('id заявки по конкурсу — для ссылки «Моя заявка»', () => {
+    const participation = participationOf(
+      [
+        { id: 10, contestId: 1, status: 'NEW' },
+        { id: 11, contestId: 3, status: 'WITHDRAWN_BY_CANDIDATE' },
+        { id: 12, status: 'NEW' },
+      ],
+      types,
+    );
+
+    expect([...participation.applicationIds]).toEqual([
+      [1, 10],
+      [3, 11],
+    ]);
+  });
+
+  it('активная заявка блокирует другие конкурсы того же типа, но не свой и не другие типы', () => {
+    const participation = participationOf([{ id: 10, contestId: 1, status: 'PENDING_BOARD_REVIEW' }], types);
+
+    expect(hasActiveInSameType({ id: 2, type: 'RESERVE' }, participation)).toBe(true);
+    expect(hasActiveInSameType({ id: 1, type: 'RESERVE' }, participation)).toBe(false);
+    expect(hasActiveInSameType({ id: 3, type: 'SUPREME_COURT' }, participation)).toBe(false);
+  });
+
+  it('финальные статусы не мешают подаче', () => {
+    for (const status of ['REJECTED_BY_BOARD', 'APPROVED', 'WITHDRAWN_BY_CANDIDATE', 'CANCELLED'] as const) {
+      const participation = participationOf([{ id: 10, contestId: 1, status }], types);
+
+      expect(hasActiveInSameType({ id: 2, type: 'RESERVE' }, participation)).toBe(false);
+    }
+  });
+
+  it('конкурсы без типа считаются одним типом', () => {
+    const participation = participationOf([{ id: 10, contestId: 4, status: 'NEW' }], types);
+
+    expect(hasActiveInSameType({ id: 5, type: undefined }, participation)).toBe(true);
+    expect(hasActiveInSameType({ id: 2, type: 'RESERVE' }, participation)).toBe(false);
+  });
+
+  it('заявка на неизвестный конкурс не учитывается — решит бэкенд', () => {
+    const participation = participationOf([{ id: 10, contestId: 99, status: 'NEW' }], types);
+
+    expect(hasActiveInSameType({ id: 2, type: 'RESERVE' }, participation)).toBe(false);
+  });
+});
+
+describe('actionFor', () => {
+  const today = '2026-09-10';
+  const card = {
+    id: 2,
+    type: 'RESERVE' as const,
+    status: 'PUBLISHED' as const,
+    startDate: '2026-09-01',
+    documentAcceptanceEndDate: '2026-10-01',
+    visibleStatus: 'NO_APPLICATION' as const,
+  };
+
+  it('открытый конкурс без заявок — «Подать заявку»', () => {
+    expect(actionFor(card, { today, banned: false, participation: NO_PARTICIPATION })).toEqual({ kind: 'apply' });
+  });
+
+  it('заявка из /my считается участием, даже если карточка устарела', () => {
+    const participation = participationOf([{ id: 7, contestId: 2, status: 'NEW' }], new Map([[2, 'RESERVE']]));
+
+    expect(actionFor(card, { today, banned: false, participation })).toEqual({ kind: 'application' });
+  });
+
+  it('активная заявка на другой конкурс того же типа', () => {
+    const participation = participationOf(
+      [{ id: 7, contestId: 1, status: 'APPROVED_AWAITING_TEST' }],
+      new Map([
+        [1, 'RESERVE'],
+        [2, 'RESERVE'],
+      ]),
+    );
+
+    expect(actionFor(card, { today, banned: false, participation })).toEqual({
+      kind: 'unavailable',
+      reason: 'active-same-type',
     });
   });
 });

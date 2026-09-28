@@ -3,8 +3,6 @@ import type { Routes } from '@angular/router';
 import { access, guestOnly } from '@shared/auth/guards';
 import { CenteredLayoutComponent } from '@shared/ui/page/centered-layout.component';
 
-import { screen } from '../screen';
-
 /** Кабинет: CANDIDATE (в группе и ACTIVE_JUDGE). Было `flows/application`. */
 export const CABINET_ROUTES: Routes = [
   {
@@ -21,12 +19,12 @@ export const CABINET_ROUTES: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'profile' },
       { path: 'profile', title: 'shell.nav.profile', loadComponent: () => import('./pages/profile.page') },
-      screen({
-        path: 'contests',
+      { path: 'contests', title: 'shell.nav.contests', loadComponent: () => import('./pages/contests/contests.page') },
+      {
+        path: 'contests/:id',
         title: 'shell.nav.contests',
-        access: 'CANDIDATE',
-        api: ['GET /contest/available', 'POST /contest-application/contest/{contestId}'],
-      }),
+        loadComponent: () => import('./pages/contests/contest-detail.page'),
+      },
       {
         path: 'applications',
         title: 'shell.nav.applications',
