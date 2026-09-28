@@ -1,0 +1,172 @@
+<div class="flex max-w-5xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    routerLink="/cabinet/applications"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'applications.detail.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="10rem" borderRadius="0.75rem" />
+    <p-skeleton height="14rem" borderRadius="0.75rem" />
+  } @else if (notFound() || !application()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-file-excel text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'applications.detail.not-found' | lang }}</p>
+      <p-button icon="pi pi-list" [label]="'applications.detail.back' | lang" routerLink="/cabinet/applications" />
+    </section>
+  } @else {
+    @let app = application()!; @let can = actions();
+
+    <app-page-header title="applications.detail.title">
+      @if (can.edit) {
+        <p-button
+          icon="pi pi-pencil"
+          severity="secondary"
+          [outlined]="true"
+          [label]="'applications.actions.edit' | lang"
+          [disabled]="busy()"
+          [routerLink]="['/cabinet/applications', app.id, 'edit']"
+        />
+      }
+      @if (can.submit) {
+        <p-button
+          icon="pi pi-send"
+          [label]="'applications.actions.submit' | lang"
+          [loading]="busy()"
+          (onClick)="sendForReview()"
+        />
+      }
+      @if (can.withdraw) {
+        <p-button
+          icon="pi pi-times-circle"
+          severity="danger"
+          [outlined]="true"
+          [label]="'applications.actions.withdraw' | lang"
+          [disabled]="busy()"
+          (onClick)="withdraw()"
+        />
+      }
+    </app-page-header>
+
+    @if (app.status === 'RETURNED_FOR_CORRECTION') {
+      <p-message severity="warn" icon="pi pi-exclamation-triangle">
+        <div class="flex flex-col gap-1">
+          <span class="font-semibold">{{ 'applications.return-reason.title' | lang }}</span>
+          <span class="whitespace-pre-line">{{ app.returnReason || ('applications.return-reason.empty' | lang) }}</span>
+          <span class="text-sm">{{ 'applications.return-reason.hint' | lang }}</span>
+        </div>
+      </p-message>
+    }
+    @if (can.stage) {
+      <p-message severity="info" icon="pi pi-key">
+        <div class="flex flex-col gap-1">
+          <span class="font-semibold">{{ 'applications.stage-hint.' + can.stage + '.title' | lang }}</span>
+          <span>{{ 'applications.stage-hint.' + can.stage + '.text' | lang }}</span>
+          <span>
+            {{ 'applications.stage-hint.address' | lang }}
+            <a class="break-all font-medium text-primary" routerLink="/testing/sign-in">{{ stageSignInUrl }}</a>
+          </span>
+        </div>
+      </p-message>
+    }
+    @if (can.complaint) {
+      <section
+        class="flex flex-col gap-3 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:flex-row tablet:items-center tablet:p-5"
+      >
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <h2 class="m-0 text-base font-semibold">{{ 'applications.complaint.title' | lang }}</h2>
+          <p class="m-0 text-sm text-surface-600">{{ 'applications.complaint.' + can.complaint | lang }}</p>
+          @if (complaintDeadline(); as deadline) {
+            <p class="m-0 text-sm text-surface-600">
+              {{ 'applications.complaint.deadline' | lang: { date: (deadline | localDate) } }}
+            </p>
+          }
+        </div>
+        <p-button
+          icon="pi pi-comment"
+          severity="warn"
+          [label]="'applications.complaint.action' | lang"
+          routerLink="/cabinet/complaints"
+          [queryParams]="complaintQuery()"
+        />
+      </section>
+    }
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <div class="flex flex-wrap items-start justify-between gap-2">
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <span class="text-sm text-surface-500">{{ 'applications.fields.contest' | lang }}</span>
+          <a
+            class="text-lg font-semibold break-words text-primary no-underline hover:underline"
+            [routerLink]="['/cabinet/contests', app.contestId]"
+          >
+            {{ app.contestName || ('applications.card.no-contest-name' | lang) }}
+          </a>
+        </div>
+        <app-status-tag kind="application" [value]="app.status" />
+      </div>
+
+      @if (app.status) {
+        <p class="m-0 mt-3 text-sm text-surface-700">{{ 'applications.hint.' + app.status | lang }}</p>
+      }
+
+      <dl class="m-0 mt-4 grid grid-cols-1 gap-x-6 gap-y-3 text-sm tablet:grid-cols-2 desktop-s:grid-cols-4">
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'applications.fields.registration-number' | lang }}</dt>
+          <dd class="m-0 font-medium">{{ app.registrationNumber || '—' }}</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'applications.fields.created-at' | lang }}</dt>
+          <dd class="m-0">{{ app.createdAt | serverDateTime }}</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'applications.fields.updated-at' | lang }}</dt>
+          <dd class="m-0">{{ app.updatedAt | serverDateTime }}</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'applications.fields.preferred-language' | lang }}</dt>
+          <dd class="m-0">
+            {{ app.preferredLanguage ? ('applications.language.' + app.preferredLanguage | lang) : '—' }}
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <div class="grid grid-cols-1 gap-4 tablet:grid-cols-2">
+      <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 mb-3 text-base font-semibold">{{ 'applications.detail.stages' | lang }}</h2>
+        <dl class="m-0 flex flex-col gap-3 text-sm">
+          @for (stage of ['test', 'essay', 'interview']; track stage) {
+            @let date = stage === 'test' ? app.testDate : stage === 'essay' ? app.essayDate : app.interviewDate;
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <dt class="text-surface-500">{{ 'applications.stage.' + stage | lang }}</dt>
+              <dd class="m-0" [class.font-medium]="!!date" [class.text-surface-400]="!date">
+                {{ date | serverDateTime: ('applications.stage.not-scheduled' | lang) }}
+              </dd>
+            </div>
+          }
+        </dl>
+      </section>
+
+      <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 mb-3 text-base font-semibold">{{ 'applications.detail.contacts' | lang }}</h2>
+        <dl class="m-0 flex flex-col gap-3 text-sm">
+          @for (field of contactFields; track field.key) {
+            <div class="flex flex-col">
+              <dt class="text-surface-500">{{ 'applications.fields.' + field.label | lang }}</dt>
+              <dd class="m-0 break-words whitespace-pre-line">{{ app[field.key] || '—' }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    </div>
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <h2 class="m-0 mb-4 text-base font-semibold">{{ 'applications.history.title' | lang }}</h2>
+      <app-application-history [history]="history()" [createdAt]="app.createdAt" />
+    </section>
+  }
+</div>

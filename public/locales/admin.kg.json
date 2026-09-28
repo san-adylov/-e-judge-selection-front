@@ -1,0 +1,352 @@
+{
+  "sign-in": {
+    "title": "Кош келиңиз",
+    "login": "Логин",
+    "login-placeholder": "Логинди киргизиңиз",
+    "password": "Сырсөз",
+    "password-placeholder": "Сырсөздү киргизиңиз",
+    "submit": "Кирүү",
+    "submit-esi": "БИС аркылуу кирүү"
+  },
+  "sidebar": {
+    "main": "Башкы бет",
+    "general": "Негизги",
+    "applications": "Өтүнмөлөр",
+    "dashboard": "Дашборд",
+    "tests": "Тесттер",
+    "essay-topics": "Жазуу тапшырмасы",
+    "results": "Жыйынтыктар",
+    "candidates": "Кандидаттар резерви",
+    "contest": "Сынактар",
+    "users": "Колдонуучулар",
+    "processes": "Процесстер",
+    "rotation": "Сотторду ротациялоо",
+    "judges": "Иштеп жаткан соттор",
+    "vacancies": "Бош орундар",
+    "education": "ЖЖМ окутуусу",
+    "integration": "Интеграция",
+    "tundukgrs": "Түндүк / Кызмат",
+    "mvdgns": "ИИМ / МНС"
+  },
+  "dashboard": {
+    "welcome": "Кош келиңиз",
+    "subtitle": "Администратор үчүн талапкерлерди тандоо тутумуна сереп"
+  },
+  "users": {
+    "table": {
+      "tin": "ИНН/ПИН",
+      "first-name": "Аты",
+      "last-name": "Фамилиясы",
+      "middle-name": "Атасынын аты",
+      "role": "Ролу",
+      "status": "Статусу"
+    },
+    "create-btn": "Колдонуучу түзүү",
+    "search-placeholder": "Аты же ИНН боюнча издөө",
+    "create-dialog": {
+      "title": "Колдонуучу түзүү",
+      "tin-label": "ИНН",
+      "tin-placeholder": "ИНН",
+      "last-name-label": "Фамилиясы",
+      "last-name-placeholder": "Фамилиясы",
+      "first-name-label": "Аты",
+      "first-name-placeholder": "Аты",
+      "middle-name-label": "Атасынын аты",
+      "middle-name-placeholder": "Атасынын аты",
+      "role-label": "Ролу",
+      "role-placeholder": "Ролу",
+      "create-btn": "Түзүү",
+      "success": "Колдонуучу ийгиликтүү түзүлдү"
+    }
+  },
+  "common": {
+    "yes": "Ооба",
+    "no": "Жок",
+    "cancel": "Жокко чыгаруу",
+    "open": "Ачуу",
+    "view": "Көрүү",
+    "connection-status": "Туташуу статусу"
+  },
+  "applications": {
+    "table": {
+      "application-date": "Арыздын күнү",
+      "contest-name": "Сынактын аталышы",
+      "full-name": "Аты-жөнү",
+      "status": "Статус",
+      "actions": "Иш-аракеттер"
+    },
+    "reject-dialog": {
+      "header": "Арызды четке кагасызбы?",
+      "reason": "Баш тартуунун себеби:",
+      "reject": "Четке кагуу"
+    },
+    "messages": {
+      "approved": "Арыз кабыл алынды",
+      "rejected": "Арыз четке кагылды"
+    }
+  },
+  "contest": {
+    "table": {
+      "contest-name": "Сынактын аталышы",
+      "description": "Сүрөттөмө",
+      "status": "Статус",
+      "start-date": "Башталган күнү",
+      "end-date": "Аяктаган күнү"
+    }
+  },
+  "results": {
+    "table": {
+      "year": "Жыл",
+      "contest-name": "Сынактын аталышы",
+      "candidates-count": "Талапкерлердин саны",
+      "completed": "Аяктады"
+    }
+  },
+  "mvd": {
+    "subtitle": "Ички иштер министрлиги жана Мамлекеттик салык кызматы менен интеграция",
+    "mvd-title": "КР ИИМ",
+    "mvd-description": "Талапкерлердин маалыматтарын текшерүү үчүн Кыргыз Республикасынын Ички иштер министрлигинин маалыматтык системалары менен интеграция.",
+    "mvd-check-criminal-record": "Соттуулугун текшерүү",
+    "mvd-check-offenses": "Административдик укук бузууларды текшерүү",
+    "mvd-passport-verification": "Паспорттук маалыматтарды текшерүү",
+    "tax-title": "КР МСК",
+    "tax-description": "Салык милдеттенмелери боюнча маалымат алуу үчүн Кыргыз Республикасынын Мамлекеттик салык кызматы менен интеграция.",
+    "tax-debt-check": "Салык карызын текшерүү",
+    "income-info": "Талапкерлердин кирешелери тууралуу маалымат",
+    "property-info": "Катталган мүлк тууралуу маалымат",
+    "mvd-active": "КР ИИМ — туташуу активдүү",
+    "tax-active": "КР МСК — туташуу активдүү"
+  },
+  "tunduk": {
+    "subtitle": "Электрондук ведомстволор аралык өз ара аракеттенүү системасы менен интеграция",
+    "tunduk-title": "Түндүк",
+    "tunduk-description": "«Түндүк» электрондук ведомстволор аралык өз ара аракеттенүү системасы Кыргыз Республикасынын мамлекеттик маалыматтык системалары ортосунда маалымат алмашууну камсыздайт.",
+    "auto-verification": "Талапкерлердин маалыматтарын автоматтык текшерүү",
+    "criminal-record-check": "Соттуулукту жана укук бузууларды текшерүү",
+    "employment-info": "Эмгек ишмердүүлүгү тууралуу маалымат алуу",
+    "kyzmat-title": "Кызмат",
+    "kyzmat-description": "«Кызмат» мамлекеттик электрондук кызмат көрсөтүүлөр порталы мамлекеттик жана муниципалдык кызматтарга электрондук форматта жеткиликтүүлүк берет.",
+    "online-applications": "Арыздарды электрондук түрдө берүү",
+    "appeal-status-tracking": "Кайрылуулардын статусун көзөмөлдөө",
+    "certificates-extracts": "Маалымкаттарды жана көчүрмөлөрдү алуу",
+    "tunduk-active": "Түндүк — туташуу активдүү",
+    "kyzmat-active": "Кызмат — туташуу активдүү"
+  },
+  "education": {
+    "subtitle": "Жогорку сот адилеттиги мектеби менен интеграция",
+    "summary": {
+      "theory": "Теорияда",
+      "internship": "Стажировкада",
+      "completed": "Аяктагандар"
+    },
+    "stage": {
+      "theory": "Теория",
+      "internship": "Стажировка"
+    },
+    "status": {
+      "success": "Ийгиликтүү",
+      "in-progress": "Процессте"
+    },
+    "table": {
+      "candidate": "Талапкер",
+      "stage": "Этап",
+      "progress": "Прогресс",
+      "finish-date": "Аяктоо",
+      "status": "ЖЖМ статусу"
+    }
+  },
+  "rotation": {
+    "subtitle": "Соттор ортосунда которуу (24²-беренеге ылайык резервден артыкчылык)",
+    "priority-title": "Ротациянын артыкчылыгы",
+    "priority-text": "Вакансия пайда болгондо алгач иштеп жаткан соттордун ротациясы каралат",
+    "review": "Карап чыгуу",
+    "empty": "Ротация боюнча маалымат табылган жок",
+    "status": {
+      "pending": "ЖС кароосунда",
+      "done": "Ротация жүргүзүлдү",
+      "sent": "СДПга өткөрүлдү"
+    },
+    "table": {
+      "court": "Сот",
+      "reason": "Вакансиянын негизи",
+      "date": "Күнү",
+      "status": "Ротация статусу"
+    }
+  },
+  "vacancies": {
+    "subtitle": "Талапкерлер резервинен дайындоо",
+    "open-vacancies": "Ачык вакансиялар",
+    "propose-by-order": "Кезеги боюнча сунуштоо",
+    "pick": "Тандоо",
+    "empty": "Вакансиялар табылган жок",
+    "summary": {
+      "total": "Баары",
+      "age-limit": "Чектүү жаш курак",
+      "early": "Мөөнөтүнөн мурда"
+    },
+    "reason": {
+      "term-end": "Мөөнөттүн бүтүшү",
+      "new-staff": "Жаңы штаттар"
+    },
+    "rotation": {
+      "in-review": "Кароодо",
+      "not-required": "Талап кылынбайт",
+      "required": "Талап кылынат"
+    },
+    "table": {
+      "court": "Сот",
+      "reason": "Негизи",
+      "date": "Күнү",
+      "rotation": "Ротация",
+      "proposed": "Сунушталды"
+    }
+  },
+  "judges": {
+    "subtitle": "Ыйгарым укуктардын мөөнөтүн көзөмөлдөө (арыз берүү: 80–60 күн)",
+    "alert-title": "5 сот арыз бериши керек",
+    "alert-text": "Арыз берүү мөөнөтү: аяктаганга чейин 80–60 күн. Кеңеште кароо: 2 жума.",
+    "notify": "Билдирүү",
+    "experience": "Стаж",
+    "days-left-short": "{0} күн калды",
+    "days-left": "{0} күн",
+    "remind": "Эскертүү",
+    "empty": "Соттор табылган жок",
+    "status": {
+      "submitted": "Берилди",
+      "not-submitted": "Бериле элек"
+    },
+    "table": {
+      "judge": "Сот",
+      "court": "Сот",
+      "end-date": "Ыйгарым укуктардын аякташы",
+      "deadline": "Арыз берүү мөөнөтү",
+      "status": "Статус"
+    }
+  },
+  "essay-topics": {
+    "add-topic": "Тапшырма кошуу",
+    "item-title": "Жазуу тапшырмасы",
+    "dialog-header": "Жазуу тапшырмасынын темасын кошуу",
+    "language-ru": "Орусча",
+    "language-kg": "Кыргызча",
+    "topic": "Тапшырма",
+    "topic-ru-placeholder": "Сүрөттөмө...",
+    "topic-kg-placeholder": "Сүрөттөмө...",
+    "question-ru": "{0}-суроо",
+    "question-kg": "{0}-суроо",
+    "question-ru-placeholder": "{0}-суроону орусча жазыңыз",
+    "question-kg-placeholder": "{0}-суроону кыргызча жазыңыз",
+    "cancel": "Жокко чыгаруу",
+    "save": "Сактоо",
+    "success": "Тема ийгиликтүү кошулду",
+    "error": "Теманы кошууда ката кетти",
+    "loading": "Жүктөлүүдө...",
+    "empty": "Жазуу тапшырмаларынын темалары табылган жок",
+    "active": "Активдүү",
+    "inactive": "Активдүү эмес",
+    "minutes": "мин.",
+    "add-button": "Кошуу",
+    "question-input-placeholder": "Суроону жазыңыз",
+    "question-label": "{0}-суроо",
+    "back": "Артка"
+  },
+  "tests": {
+    "add-category": "Категория кошуу +",
+    "upload-excel": "Excel жүктөө",
+    "excel-header": "Excel жүктөө",
+    "choose-excel": "Excel тандоо",
+    "download-template": "Шаблонду жүктөп алуу",
+    "save": "Сактоо",
+    "selected-file": "Тандалды:",
+    "choose-xlsx": ".xlsx / .xls файлды тандаңыз",
+    "drop-excel": "Файлды бул жерге сүйрөп таштаңыз же «Excel тандоо» басыңыз.",
+    "close": "Жабуу",
+    "excel-format-error": ".xlsx же .xls гана жүктөөгө болот",
+    "template-file-name": "суроолор_шаблону.xlsx",
+    "loading-categories": "Категориялар жүктөлүүдө...",
+    "no-description": "Сүрөттөмө көрсөтүлгөн эмес",
+    "edit": "Түзөтүү",
+    "delete": "Өчүрүү",
+    "empty-categories": "Азырынча категориялар жок. Биринчи категорияны түзүңүз.",
+    "edit-category": "Категорияны түзөтүү",
+    "new-category": "Жаңы категория",
+    "category-name": "Категориянын аталышы",
+    "category-name-placeholder": "Категориянын аталышын киргизиңиз",
+    "description": "Сүрөттөмө",
+    "description-placeholder": "Категориянын сүрөттөмөсүн киргизиңиз",
+    "cancel": "Жокко чыгаруу",
+    "create": "Түзүү",
+    "delete-category-confirm": "«{0}» категориясын өчүрөсүзбү?",
+    "category-deleted": "Категория өчүрүлдү",
+    "category-updated": "Категория жаңыртылды",
+    "category-created": "Категория түзүлдү",
+    "language-ru": "Орусча",
+    "language-kg": "Кыргызча",
+    "question": "Суроо",
+    "question-kg": "Суроо",
+    "question-placeholder": "Суроонун текстин орусча жазыңыз",
+    "question-kg-placeholder": "Суроонун текстин кыргызча жазыңыз",
+    "answer": "Жооп {0}",
+    "answer-kg": "Жооп {0}",
+    "answer-placeholder": "Жооптун {0} вариантын орусча жазыңыз",
+    "answer-kg-placeholder": "Жооптун {0} вариантын кыргызча жазыңыз",
+    "validation-blank": "Талаа боштуктардан гана турбашы керек",
+    "validation-required": "Милдеттүү талаа",
+    "validation-maxlength": "Максимум {0} белги",
+    "select-correct-answer": "Туура жооп катары варианттардын бирин тандаңыз",
+    "question-created": "Суроо ийгиликтүү кошулду",
+    "add-question": "Суроо кошуу +",
+    "loading-questions": "Суроолор жүктөлүүдө...",
+    "active": "Активдүү",
+    "inactive": "Активдүү эмес",
+    "no-text": "Текст жок",
+    "correct-answer": "Туура жооп",
+    "no-answers": "Жооптор жок.",
+    "empty-questions": "Бул категорияда азырынча суроолор жок.",
+    "add-question-header": "Суроо кошуу",
+    "category-prefix": "Категория: {0}",
+    "category-id": "Категория #{0}",
+    "zero-questions": "0 суроо",
+    "pagination-summary": "{0}-{1} / {2}",
+    "delete-question-confirm": "Суроону өчүрүүнү каалайсызбы?"
+  },
+  "routes": {
+    "sign-in": "Системага кирүү",
+    "test-category": "Категория суроолору",
+    "test-results": "Тестирлөөнүн жыйынтыктары",
+    "notifications": "Билдирмелер"
+  },
+  "holidays": {
+    "title": "Майрам күндөрү",
+    "name-label": "Майрамдын аталышы",
+    "name-placeholder": "Майрамдын аталышы",
+    "date-label": "Күнү",
+    "date-placeholder": "Күнү",
+    "cancel": "Жокко чыгаруу",
+    "add": "Кошуу",
+    "success": "Майрам ийгиликтүү кошулду",
+    "recurring": "Жыл сайын",
+    "col-name": "Аталышы",
+    "col-date": "Күнү",
+    "col-recurring": "Жыл сайын",
+    "delete": "Жок кылуу",
+    "empty": "Майрам күндөрү кошулган жок"
+  },
+  "candidates-rating": {
+    "reserve-title": "Талапкерлердин резерви",
+    "select-contest": "Конкурсту тандаңыз",
+    "loading-rating": "Рейтинг жүктөлүүдө...",
+    "no-active-contests": "Активдүү конкурстар жок",
+    "rating-empty": "Тандалган конкурс боюнча рейтинг азырынча бош",
+    "candidate": "Талапкер",
+    "documents": "Документтер",
+    "test": "Тест",
+    "essay": "Жазуу тапшырмасы",
+    "interview": "Маектешүү",
+    "total": "Жыйынтык",
+    "result": "Натыйжа",
+    "reserve-term": "Резервдеги мөөнөт",
+    "in-reserve": "Резервде",
+    "not-passed": "Өтпөдү"
+  }
+}

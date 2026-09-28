@@ -1,0 +1,32 @@
+/*
+ * Одна дизайн-система: PrimeNG (слой primeng) + Tailwind 4 + tailwindcss-primeui.
+ * daisyUI и SCSS-оверрайды v1 не переносятся. Шрифт Inter — локально (@fontsource), без внешних CDN из-за CSP.
+ */
+@layer theme, base, primeng, components, utilities;
+
+@import 'tailwindcss';
+@import 'tailwindcss-primeui';
+
+@theme {
+  /* Брейкпоинты v1: 720 / 1400 / 1920 px — те же, что BREAKPOINTS в app.config.ts. */
+  --breakpoint-*: initial;
+  --breakpoint-tablet: 720px;
+  --breakpoint-desktop-s: 1400px;
+  --breakpoint-desktop: 1920px;
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--p-surface-50);
+    color: var(--p-surface-900);
+    -webkit-font-smoothing: antialiased;
+  }
+}

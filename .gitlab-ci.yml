@@ -1,0 +1,79 @@
+stages:
+  - check
+  - build
+  - e2e
+  - deploy
+
+variables:
+  NODE_IMAGE: harbor.gp.kg/library/node:22-alpine
+
+# lint, typecheck и unit блокируют merge request.
+check:
+  stage: check
+  image: $NODE_IMAGE
+  cache:
+    key: { files: [package-lock.json] }
+    paths: [.npm/]
+  script:
+    - npm ci --cache .npm --no-audit --no-fund
+    - npm run lint
+    - npm run typecheck
+    - npx ng test --watch=false
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "release/v2"
+
+build-docker-image:
+  stage: build
+  tags:
+    - main-sot-vm-runner
+  script:
+    - IMG_ID=$(docker images | grep $CI_REGISTRY_IMAGE | awk '{print $3}') || echo old images
+    - docker rmi $IMG_ID || echo removed old images
+    - docker build --no-cache -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA .
+    - docker login -u $CI_USER -p $CI_TOKEN $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "release/v2"
+
+# Playwright на тестовом стенде бэкенда v2: E2E_BASE_URL — адрес фронта на стенде (переменная CI/CD).
+e2e:
+  stage: e2e
+  image: mcr.microsoft.com/playwright:v1.63.0-noble
+  cache:
+    key: { files: [package-lock.json] }
+    paths: [.npm/]
+  script:
+    - npm ci --cache .npm --no-audit --no-fund
+    - npx playwright test
+  artifacts:
+    when: always
+    paths: [playwright-report/, test-results/]
+    reports:
+      junit: test-results/junit.xml
+  rules:
+    - if: $E2E_BASE_URL == null || $E2E_BASE_URL == ""
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "release/v2"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# Деплой в prod — как в v1, только из main.
+deploy to prd:
+  stage: deploy
+  tags:
+    - vm-runner-tandoo-back-prod
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - docker login -u $CI_USER -p $CI_TOKEN $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker rm -f front || echo "No existing container to remove"
+    - docker run --name front -d -p 3000:3000
+      -e TZ=Asia/Bishkek --restart unless-stopped
+      $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker image prune -f -a
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

@@ -1,0 +1,100 @@
+<ng-template #navigation>
+  <nav class="flex flex-col gap-5 px-3 py-4">
+    @for (section of visibleNav(); track $index) {
+      <div class="flex flex-col gap-1">
+        @if (section.title) {
+          <span class="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-primary-200">
+            {{ section.title | lang }}
+          </span>
+        }
+        @for (item of section.items; track item.link) {
+          <a
+            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-primary-50 no-underline transition-colors hover:bg-white/10"
+            routerLinkActive="!bg-white/15 font-semibold"
+            [routerLink]="item.link"
+            [routerLinkActiveOptions]="{ exact: !!item.exact }"
+            (click)="menuOpen.set(false)"
+          >
+            <i [class]="item.icon"></i>
+            <span>{{ item.label | lang }}</span>
+          </a>
+        }
+      </div>
+    }
+  </nav>
+</ng-template>
+
+<div class="flex min-h-dvh bg-surface-50 text-surface-900">
+  @if (visibleNav().length) {
+    <aside class="sticky top-0 hidden h-dvh w-72 shrink-0 flex-col overflow-y-auto bg-primary-900 desktop-s:flex">
+      <div class="flex h-16 items-center gap-3 border-b border-white/10 px-6 text-white">
+        <img src="/logo.svg" alt="" class="size-8" />
+        <span class="font-semibold leading-tight">{{ title() | lang }}</span>
+      </div>
+      <ng-container [ngTemplateOutlet]="navigation" />
+    </aside>
+
+    <p-drawer
+      styleClass="!w-72 !bg-primary-900 !border-0"
+      [visible]="menuOpen()"
+      [header]="title() | lang"
+      (visibleChange)="menuOpen.set($event)"
+    >
+      <ng-container [ngTemplateOutlet]="navigation" />
+    </p-drawer>
+  }
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header
+      class="sticky top-0 z-10 flex h-16 items-center gap-2 border-b border-surface-200 bg-surface-0 px-4 tablet:px-6"
+    >
+      @if (visibleNav().length) {
+        <p-button
+          class="desktop-s:hidden"
+          icon="pi pi-bars"
+          severity="secondary"
+          [text]="true"
+          [ariaLabel]="'shell.menu' | lang"
+          (onClick)="menuOpen.set(true)"
+        />
+      }
+      <span class="truncate font-semibold desktop-s:hidden">{{ title() | lang }}</span>
+
+      <div class="ml-auto flex items-center gap-2">
+        <app-area-switcher class="hidden tablet:block" [current]="area()" />
+        <ng-content select="[shellActions]" />
+        <app-lang-switcher />
+
+        @if (session.user(); as user) {
+          <div class="hidden items-center gap-2 pl-2 tablet:flex">
+            <span
+              class="flex size-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-800"
+              aria-hidden="true"
+            >
+              {{ initials() }}
+            </span>
+            <span class="max-w-48 truncate text-sm">{{ user.fullName }}</span>
+          </div>
+          <p-button
+            icon="pi pi-sign-out"
+            severity="secondary"
+            [text]="true"
+            [ariaLabel]="'shell.logout' | lang"
+            (onClick)="logout()"
+          />
+        }
+      </div>
+    </header>
+
+    @if (session.expiringSoon()) {
+      <div class="flex items-center gap-3 bg-amber-50 px-4 py-2 text-sm text-amber-900 tablet:px-6" role="status">
+        <i class="pi pi-clock"></i>
+        <span>{{ 'shell.session.expiring' | lang }}</span>
+      </div>
+    }
+
+    <main class="flex-1 p-4 tablet:p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>

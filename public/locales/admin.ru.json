@@ -1,0 +1,352 @@
+{
+  "sign-in": {
+    "title": "Добро пожаловать",
+    "login": "Логин",
+    "login-placeholder": "Введите логин",
+    "password": "Пароль",
+    "password-placeholder": "Введите пароль",
+    "submit": "Войти",
+    "submit-esi": "Войти через ЕСИ"
+  },
+  "sidebar": {
+    "main": "Главная",
+    "general": "Главное",
+    "applications": "Заявки",
+    "dashboard": "Дашборд",
+    "tests": "Тесты",
+    "essay-topics": "Письменное задание",
+    "results": "Результаты",
+    "candidates": "Резерв кандидатов",
+    "contest": "Конкурсы",
+    "users": "Пользователи",
+    "processes": "Процессы",
+    "rotation": "Ротация судей",
+    "judges": "Действующие судьи",
+    "vacancies": "Вакансии",
+    "education": "Обучение ВШП",
+    "integration": "Интеграция",
+    "tundukgrs": "Түндүк / Кызмат",
+    "mvdgns": "МВД / ГНС"
+  },
+  "dashboard": {
+    "welcome": "Добро пожаловать",
+    "subtitle": "Обзор системы отбора кандидатов для администратора"
+  },
+  "users": {
+    "table": {
+      "tin": "ИНН/ПИН",
+      "first-name": "Имя",
+      "last-name": "Фамилия",
+      "middle-name": "Отчество",
+      "role": "Роль",
+      "status": "Статус"
+    },
+    "create-btn": "Создать пользователя",
+    "search-placeholder": "Поиск по имени или ИНН",
+    "create-dialog": {
+      "title": "Создать пользователя",
+      "tin-label": "ИНН",
+      "tin-placeholder": "ИНН",
+      "last-name-label": "Фамилия",
+      "last-name-placeholder": "Фамилия",
+      "first-name-label": "Имя",
+      "first-name-placeholder": "Имя",
+      "middle-name-label": "Отчество",
+      "middle-name-placeholder": "Отчество",
+      "role-label": "Роль",
+      "role-placeholder": "Роль",
+      "create-btn": "Создать",
+      "success": "Пользователь успешно создан"
+    }
+  },
+  "common": {
+    "yes": "Да",
+    "no": "Нет",
+    "cancel": "Отмена",
+    "open": "Открыть",
+    "view": "Просмотр",
+    "connection-status": "Статус подключения"
+  },
+  "applications": {
+    "table": {
+      "application-date": "Дата заявки",
+      "contest-name": "Название конкурса",
+      "full-name": "ФИО",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "reject-dialog": {
+      "header": "Отклонить заявку?",
+      "reason": "Причина отказа:",
+      "reject": "Отклонить"
+    },
+    "messages": {
+      "approved": "Заявка принята",
+      "rejected": "Заявка отклонена"
+    }
+  },
+  "contest": {
+    "table": {
+      "contest-name": "Название конкурса",
+      "description": "Описание",
+      "status": "Статус",
+      "start-date": "Дата начала",
+      "end-date": "Дата окончания"
+    }
+  },
+  "results": {
+    "table": {
+      "year": "Год",
+      "contest-name": "Название конкурса",
+      "candidates-count": "Кол-во кандидатов",
+      "completed": "Завершен"
+    }
+  },
+  "mvd": {
+    "subtitle": "Интеграция с Министерством внутренних дел и Государственной налоговой службой",
+    "mvd-title": "МВД КР",
+    "mvd-description": "Интеграция с информационными системами Министерства внутренних дел Кыргызской Республики для проверки данных кандидатов.",
+    "mvd-check-criminal-record": "Проверка наличия судимости",
+    "mvd-check-offenses": "Проверка административных правонарушений",
+    "mvd-passport-verification": "Верификация паспортных данных",
+    "tax-title": "ГНС КР",
+    "tax-description": "Интеграция с Государственной налоговой службой Кыргызской Республики для получения сведений о налоговых обязательствах.",
+    "tax-debt-check": "Проверка налоговой задолженности",
+    "income-info": "Сведения о доходах кандидатов",
+    "property-info": "Информация о зарегистрированном имуществе",
+    "mvd-active": "МВД КР — подключение активно",
+    "tax-active": "ГНС КР — подключение активно"
+  },
+  "tunduk": {
+    "subtitle": "Интеграция с системой электронного межведомственного взаимодействия",
+    "tunduk-title": "Тундук",
+    "tunduk-description": "Система электронного межведомственного взаимодействия «Түндүк» обеспечивает обмен данными между государственными информационными системами Кыргызской Республики.",
+    "auto-verification": "Автоматическая верификация данных кандидатов",
+    "criminal-record-check": "Проверка судимости и правонарушений",
+    "employment-info": "Получение сведений о трудовой деятельности",
+    "kyzmat-title": "Кызмат",
+    "kyzmat-description": "Государственный портал электронных услуг «Кызмат» предоставляет доступ к государственным и муниципальным услугам в электронном формате.",
+    "online-applications": "Подача заявлений в электронном виде",
+    "appeal-status-tracking": "Отслеживание статуса обращений",
+    "certificates-extracts": "Получение справок и выписок",
+    "tunduk-active": "Түндүк — подключение активно",
+    "kyzmat-active": "Кызмат — подключение активно"
+  },
+  "education": {
+    "subtitle": "Интеграция с Высшей школой правосудия",
+    "summary": {
+      "theory": "На теории",
+      "internship": "На стажировке",
+      "completed": "Завершили"
+    },
+    "stage": {
+      "theory": "Теория",
+      "internship": "Стажировка"
+    },
+    "status": {
+      "success": "Успешно",
+      "in-progress": "В процессе"
+    },
+    "table": {
+      "candidate": "Кандидат",
+      "stage": "Этап",
+      "progress": "Прогресс",
+      "finish-date": "Завершение",
+      "status": "Статус ВШП"
+    }
+  },
+  "rotation": {
+    "subtitle": "Перевод между судами (приоритет над резервом согласно ст. 24²)",
+    "priority-title": "Приоритет ротации",
+    "priority-text": "При образовании вакансии сначала рассматривается ротация действующих судей",
+    "review": "Рассмотреть",
+    "empty": "Данные о ротации не найдены",
+    "status": {
+      "pending": "На рассмотрении ВС",
+      "done": "Ротация проведена",
+      "sent": "Передано в СДП"
+    },
+    "table": {
+      "court": "Суд",
+      "reason": "Основание вакансии",
+      "date": "Дата",
+      "status": "Статус ротации"
+    }
+  },
+  "vacancies": {
+    "subtitle": "Замещение из резерва кандидатов",
+    "open-vacancies": "Открытые вакансии",
+    "propose-by-order": "Предложить по очереди",
+    "pick": "Подобрать",
+    "empty": "Вакансии не найдены",
+    "summary": {
+      "total": "Всего",
+      "age-limit": "Предельный возраст",
+      "early": "Досрочное"
+    },
+    "reason": {
+      "term-end": "Истечение срока",
+      "new-staff": "Новые штаты"
+    },
+    "rotation": {
+      "in-review": "На рассмотрении",
+      "not-required": "Не требуется",
+      "required": "Требуется"
+    },
+    "table": {
+      "court": "Суд",
+      "reason": "Основание",
+      "date": "Дата",
+      "rotation": "Ротация",
+      "proposed": "Предложено"
+    }
+  },
+  "judges": {
+    "subtitle": "Контроль сроков полномочий (подача заявления: 80–60 дней)",
+    "alert-title": "5 судей должны подать заявление",
+    "alert-text": "Срок подачи: 80–60 дней до окончания. Рассмотрение Советом: 2 недели.",
+    "notify": "Уведомить",
+    "experience": "Стаж",
+    "days-left-short": "Осталось {0} дня",
+    "days-left": "{0} дней",
+    "remind": "Напомнить",
+    "empty": "Судьи не найдены",
+    "status": {
+      "submitted": "Подано",
+      "not-submitted": "Не подано"
+    },
+    "table": {
+      "judge": "Судья",
+      "court": "Суд",
+      "end-date": "Окончание полномочий",
+      "deadline": "Срок подачи",
+      "status": "Статус"
+    }
+  },
+  "essay-topics": {
+    "add-topic": "Добавить задание",
+    "item-title": "Письменное задание",
+    "dialog-header": "Добавить тему письменного задания",
+    "language-ru": "Русский",
+    "language-kg": "Кыргызский",
+    "topic": "Задание",
+    "topic-ru-placeholder": "Описание...",
+    "topic-kg-placeholder": "Описание...",
+    "question-ru": "Вопрос {0}",
+    "question-kg": "{0}-суроо",
+    "question-ru-placeholder": "Введите вопрос {0}",
+    "question-kg-placeholder": "{0}-суроону жазыңыз",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "success": "Тема успешно добавлена",
+    "error": "Ошибка при добавлении темы",
+    "loading": "Загрузка...",
+    "empty": "Темы письменных заданий не найдены",
+    "active": "Активен",
+    "inactive": "Неактивен",
+    "minutes": "мин.",
+    "add-button": "Добавить",
+    "question-input-placeholder": "Введите вопрос",
+    "question-label": "Вопрос {0}",
+    "back": "Назад"
+  },
+  "tests": {
+    "add-category": "Добавить категорию +",
+    "upload-excel": "Загрузить Excel",
+    "excel-header": "Загрузка Excel",
+    "choose-excel": "Выбрать Excel",
+    "download-template": "Скачать шаблон",
+    "save": "Сохранить",
+    "selected-file": "Выбрано:",
+    "choose-xlsx": "Выберите файл .xlsx / .xls",
+    "drop-excel": "Перетащите файл сюда или нажмите «Выбрать Excel».",
+    "close": "Закрыть",
+    "excel-format-error": "Можно загрузить только .xlsx или .xls",
+    "template-file-name": "шаблон_вопросов.xlsx",
+    "loading-categories": "Загрузка категорий...",
+    "no-description": "Описание не указано",
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "empty-categories": "Категорий пока нет. Создайте первую категорию.",
+    "edit-category": "Редактирование категории",
+    "new-category": "Новая категория",
+    "category-name": "Название категории",
+    "category-name-placeholder": "Введите название категории",
+    "description": "Описание",
+    "description-placeholder": "Введите описание категории",
+    "cancel": "Отмена",
+    "create": "Создать",
+    "delete-category-confirm": "Удалить категорию «{0}»?",
+    "category-deleted": "Категория удалена",
+    "category-updated": "Категория обновлена",
+    "category-created": "Категория создана",
+    "language-ru": "Русский",
+    "language-kg": "Кыргызский",
+    "question": "Вопрос",
+    "question-kg": "Суроо",
+    "question-placeholder": "Введите текст вопроса",
+    "question-kg-placeholder": "Суроонун текстин жазыңыз",
+    "answer": "Ответ {0}",
+    "answer-kg": "Жооп {0}",
+    "answer-placeholder": "Введите вариант ответа {0}",
+    "answer-kg-placeholder": "Жооптун {0} вариантын жазыңыз",
+    "validation-blank": "Поле не может содержать только пробелы",
+    "validation-required": "Обязательное поле",
+    "validation-maxlength": "Максимум {0} символов",
+    "select-correct-answer": "Выберите из вариантов ответов как правильный",
+    "question-created": "Вопрос добавлен успешно",
+    "add-question": "Добавить вопрос +",
+    "loading-questions": "Загрузка вопросов...",
+    "active": "Активный",
+    "inactive": "Неактивный",
+    "no-text": "Без текста",
+    "correct-answer": "Правильный ответ",
+    "no-answers": "Ответы отсутствуют.",
+    "empty-questions": "В этой категории пока нет вопросов.",
+    "add-question-header": "Добавить вопрос",
+    "category-prefix": "Категория: {0}",
+    "category-id": "Категория #{0}",
+    "zero-questions": "0 вопросов",
+    "pagination-summary": "{0}-{1} из {2}",
+    "delete-question-confirm": "Уверены, что хотите удалить вопрос?"
+  },
+  "routes": {
+    "sign-in": "Вход в систему",
+    "test-category": "Вопросы категории",
+    "test-results": "Результаты тестирования",
+    "notifications": "Уведомления"
+  },
+  "holidays": {
+    "title": "Праздничные даты",
+    "name-label": "Название праздника",
+    "name-placeholder": "Название праздника",
+    "date-label": "Дата",
+    "date-placeholder": "Дата",
+    "cancel": "Отмена",
+    "add": "Добавить",
+    "success": "Праздник успешно добавлен",
+    "recurring": "Ежегодный",
+    "col-name": "Название",
+    "col-date": "Дата",
+    "col-recurring": "Ежегодный",
+    "delete": "Удалить",
+    "empty": "Праздничные даты не добавлены"
+  },
+  "candidates-rating": {
+    "reserve-title": "Резерв кандидатов",
+    "select-contest": "Выберите конкурс",
+    "loading-rating": "Загрузка рейтинга...",
+    "no-active-contests": "Нет активных конкурсов",
+    "rating-empty": "По выбранному конкурсу рейтинг пока пуст",
+    "candidate": "Кандидат",
+    "documents": "Документы",
+    "test": "Тест",
+    "essay": "Письменное задание",
+    "interview": "Собеседование",
+    "total": "Итог",
+    "result": "Результат",
+    "reserve-term": "Срок в резерве",
+    "in-reserve": "В Резерве",
+    "not-passed": "Не прошел"
+  }
+}

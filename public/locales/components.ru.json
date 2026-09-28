@@ -1,0 +1,52 @@
+{
+  "button": {
+    "save": "Сохранить",
+    "next": "Далее",
+    "skip": "Пропустить",
+    "create-app": "Подать заявку"
+  },
+  "input": {
+    "home-address": "Домашний адрес",
+    "home-phone": "Домашний телефон",
+    "work-phone": "Рабочий телефон",
+    "email": "Электронная почта",
+    "contact-person": "Контактный номер",
+    "language-label": "Предпочитаемый язык прохождения отбора",
+    "language-kg": "Кыргызский",
+    "language-ru": "Русский",
+    "tin": "ИНН/ПИН",
+    "photo" : "Выбрать Фотографию",
+    "choose" : "Выбрать",
+    "delete" : "Удалить",
+    "edit" : "Изменить",
+    "last-name": "Фамилия",
+    "first-name": "Имя",
+    "middle-name": "Отчество",
+    "birth-date": "Дата рождения",
+    "citizenship": "Гражданство",
+    "marital-status": "Семейное положение",
+    "marital-single": "Холостой(ая)",
+    "marital-married": "Женат/Замужем",
+    "marital-divorced": "Разведен(а)",
+    "birth-place": "Место рождения",
+    "gender-label": "Ваш пол",
+    "gender-male": "Мужской",
+    "gender-female": "Женский",
+    "phone": "Телефон",
+    "residential-address": "Адрес по прописке",
+    "birth-certificate-place": "Место рождения согласно свидетельству о рождения",
+    "place-of-actual-residence": "Место фактического проживания",
+    "additional-phone": "Дополнительный телефон",
+    "additional-email": "Дополнительный email",
+    "additional-information": "Дополнительная информация",
+    "application-date": "Дата подачи заявления",
+    "char-limit-reached": "Достигнут лимит 1000 символов, больше ввести нельзя"
+  },
+  "status-chip": {
+    "new": "Новая",
+    "pending": "В ожидании",
+    "rejected": "Отклонена",
+    "approved": "Принята",
+    "not-set": "Статус отсутствует"
+  }
+}

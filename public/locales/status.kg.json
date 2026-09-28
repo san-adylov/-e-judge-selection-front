@@ -1,0 +1,111 @@
+{
+  "application": {
+    "NEW": "Долбоор",
+    "PENDING_SECRETARY_REVIEW": "Каттоону күтүп жатат",
+    "RETURNED_FOR_CORRECTION": "Оңдоого кайтарылды",
+    "PENDING_BOARD_REVIEW": "Катталды",
+    "REJECTED_BY_BOARD": "Кеңеш тарабынан четке кагылды",
+    "APPROVED_AWAITING_TEST": "Бекитилди, тестирлөөнү күтүүдө",
+    "TEST_IN_PROGRESS": "Тестирлөө жүрүүдө",
+    "TEST_FAILED": "Тест тапшырылган жок",
+    "NO_SHOW_TEST": "Тестирлөөгө келген жок",
+    "REJECTED_AFTER_TEST": "Тесттен кийин четке кагылды",
+    "PENDING_ESSAY": "Жазуу тапшырмасынын башталышын күтүүдө",
+    "NO_SHOW_ESSAY": "Жазуу тапшырмасына келген жок",
+    "PENDING_INTERVIEW": "Маектешүүнү күтүүдө",
+    "APPROVED": "Бекитилди",
+    "REJECTED_AFTER_INTERVIEW": "Четке кагылды (маек)",
+    "WITHDRAWN_BY_CANDIDATE": "Талапкер тарабынан кайтарып алынды",
+    "CANCELLED": "Жокко чыгарылды"
+  },
+  "visible": {
+    "NO_APPLICATION": "Арыз берилген жок",
+    "DRAFT": "Долбоор",
+    "APPLY": "Арыз берилди",
+    "NOT_APPLY": "Катышуу аяктады"
+  },
+  "contest": {
+    "CREATED": "Түзүлдү",
+    "PENDING_OPENING": "Ачылышын күтүүдө",
+    "READY_TO_PUBLISH": "Жарыялоого даяр",
+    "PUBLISHED": "Жарыяланды",
+    "PENDING_DOCUMENT_REVIEW": "Документтерди текшерүүнү күтүүдө",
+    "DOCUMENT_REVIEW_APPROVED": "Документтер текшерилди",
+    "PENDING_CALENDAR_APPROVAL": "Планды бекитүүнү күтүүдө",
+    "CALENDAR_APPROVED": "Календардык план бекитилди",
+    "PENDING_INTERVIEW": "Маектешүүнү күтүүдө",
+    "INTERVIEW_COMPLETED": "Маектешүү аяктады",
+    "PENDING_CLOSURE": "Жабылышын күтүүдө",
+    "COMPLETED": "Аяктады",
+    "CANCELLED": "Жокко чыгарылды"
+  },
+  "contestType": {
+    "RESERVE": "Судьялардын резервине",
+    "SUPREME_COURT": "Жогорку сот",
+    "CONSTITUTIONAL_COURT": "Конституциялык сот"
+  },
+  "vacancy": {
+    "DRAFT": "Долбоор",
+    "READY_TO_PUBLISH": "Жарыялоого даяр",
+    "PUBLISHED": "Жарыяланды",
+    "REVIEW": "Кароо",
+    "CLOSED": "Жабылды",
+    "CANCELLED": "Жокко чыгарылды"
+  },
+  "vacancyApplication": {
+    "DRAFT": "Сунуш",
+    "SUBMITTED": "Макулдук жөнөтүлдү",
+    "APPROVED": "Дайындалды",
+    "REJECTED": "Четке кагылды",
+    "WITHDRAWN": "Баш тартуу",
+    "RESERVE_EXPIRED": "Резервдин мөөнөтү бүттү"
+  },
+  "reserve": {
+    "ACTIVE": "Резервде",
+    "SUBMITTED": "Бош орун сунушталды",
+    "APPROVED": "Жактырылды",
+    "REJECTED": "Четке кагылды",
+    "EXCLUDED": "Резервден чыгарылды",
+    "APPOINTED": "Дайындалды",
+    "CONFIRMED": "Дайындоо ырасталды",
+    "NOT_CONFIRMED": "Дайындоо ырасталган жок"
+  },
+  "complaint": {
+    "SUBMITTED": "Берилди",
+    "UNDER_REVIEW": "Каралууда",
+    "APPROVED": "Канааттандырылды",
+    "REJECTED": "Четке кагылды"
+  },
+  "complaintType": {
+    "DOCUMENT_STAGE": "Документтерди баалоо",
+    "TEST_RESULT": "Тестирлөөнүн жыйынтыктары",
+    "CONTEST_VIOLATION": "Сынактын бузулушу"
+  },
+  "judgeApplication": {
+    "DRAFT": "Долбоор",
+    "PENDING_SECRETARY_REVIEW": "Катчынын текшерүүсүн күтүүдө",
+    "REGISTERED": "Катталды",
+    "PENDING_DOCUMENT_REVIEW": "Документтерди текшерүү",
+    "REJECTED_AFTER_DOCUMENT_REVIEW": "Четке кагылды (документтер)",
+    "APPROVED_AFTER_DOCUMENT_REVIEW": "Уруксат берилди (документтер)",
+    "PENDING_ASSESSMENT_APPROVAL": "Баалоону бекитүү",
+    "REJECTED_ASSESSMENT_APPROVAL": "Четке кагылды (кесиптик баа)",
+    "APPROVED_ASSESSMENT_APPROVAL": "Жактырылды (кесиптик баа)",
+    "PENDING_INTERVIEW": "Маектешүү",
+    "REJECTED_AFTER_INTERVIEW": "Четке кагылды (маектешүү)",
+    "APPROVED_AFTER_INTERVIEW": "Жактырылды (маектешүү)"
+  },
+  "judgeConfirmation": {
+    "CREATED": "Долбоор",
+    "PENDING_SECRETARY_REVIEW": "Катчынын текшерүүсүн күтүүдө",
+    "UNDER_REVIEW": "Каралууда",
+    "APPROVED": "Статус ырасталды",
+    "REJECTED": "Баш тартылды"
+  },
+  "meeting": {
+    "APPOINTED": "Дайындалган",
+    "OPENED": "Ачылган",
+    "APPROVED": "Бекитилген",
+    "DECLINED": "Четке кагылган"
+  }
+}

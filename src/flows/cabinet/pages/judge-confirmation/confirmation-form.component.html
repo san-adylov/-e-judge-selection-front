@@ -1,0 +1,133 @@
+<section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+  <div class="mb-1 flex flex-wrap items-center gap-2">
+    <h2 class="m-0 min-w-0 flex-1 text-lg font-semibold">
+      {{ (isDraft() ? 'judge-confirmation.form.title-draft' : 'judge-confirmation.form.title-new') | lang }}
+    </h2>
+    @if (isDraft()) {
+      <app-status-tag kind="judgeConfirmation" [value]="source()?.status" />
+    }
+  </div>
+  <p class="m-0 mb-5 text-sm text-surface-500">
+    {{ (isDraft() ? 'judge-confirmation.form.draft-hint' : 'judge-confirmation.form.new-hint') | lang }}
+  </p>
+
+  <form class="flex flex-col gap-5" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="flex flex-col gap-1">
+      <label for="jc-court" class="text-sm font-medium">
+        {{ 'judge-confirmation.form.court' | lang }} <span class="text-red-500">*</span>
+      </label>
+      <p-select
+        inputId="jc-court"
+        formControlName="courtId"
+        optionLabel="label"
+        optionValue="value"
+        filterBy="label"
+        appendTo="body"
+        styleClass="w-full"
+        [options]="courts()"
+        [filter]="true"
+        [showClear]="true"
+        [placeholder]="'judge-confirmation.form.court-placeholder' | lang"
+        [invalid]="error('courtId')"
+      />
+      @if (error('courtId')) {
+        <small class="text-red-600">{{ 'judge-confirmation.form.required' | lang }}</small>
+      }
+    </div>
+
+    <fieldset class="m-0 flex min-w-0 flex-col gap-2 border-0 p-0">
+      <legend class="mb-1 p-0 text-sm font-medium">
+        {{ 'judge-confirmation.form.experience' | lang }} <span class="text-red-500">*</span>
+      </legend>
+      <div class="grid gap-3 tablet:grid-cols-2">
+        <div class="flex flex-col gap-1">
+          <label for="jc-from" class="text-xs text-surface-500">{{
+            'judge-confirmation.form.experience-from' | lang
+          }}</label>
+          <p-datepicker
+            inputId="jc-from"
+            formControlName="workExperienceFrom"
+            dateFormat="dd.mm.yy"
+            appendTo="body"
+            styleClass="w-full"
+            [showIcon]="true"
+            [maxDate]="value().workExperienceTo ?? today"
+            [invalid]="error('workExperienceFrom') || rangeInvalid()"
+          />
+          @if (error('workExperienceFrom')) {
+            <small class="text-red-600">{{ 'judge-confirmation.form.required' | lang }}</small>
+          }
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="jc-to" class="text-xs text-surface-500">{{
+            'judge-confirmation.form.experience-to' | lang
+          }}</label>
+          <p-datepicker
+            inputId="jc-to"
+            formControlName="workExperienceTo"
+            dateFormat="dd.mm.yy"
+            appendTo="body"
+            styleClass="w-full"
+            [showIcon]="true"
+            [minDate]="value().workExperienceFrom"
+            [maxDate]="today"
+            [invalid]="error('workExperienceTo') || rangeInvalid()"
+          />
+          @if (error('workExperienceTo')) {
+            <small class="text-red-600">{{ 'judge-confirmation.form.required' | lang }}</small>
+          }
+        </div>
+      </div>
+      @if (rangeInvalid()) {
+        <small class="text-red-600">{{ 'judge-confirmation.form.range' | lang }}</small>
+      }
+    </fieldset>
+
+    <fieldset class="m-0 flex min-w-0 flex-col gap-3 border-0 p-0">
+      <legend class="mb-1 p-0 text-sm font-medium">{{ 'judge-confirmation.form.documents' | lang }}</legend>
+      @for (file of files; track file.key) {
+        <div
+          class="flex flex-col gap-2 rounded-lg border p-3"
+          [class.border-surface-200]="!error(file.key)"
+          [class.border-red-300]="error(file.key)"
+        >
+          <span class="text-sm"> {{ file.label | lang }} <span class="text-red-500">*</span> </span>
+          <app-file-upload [category]="file.category" [formControlName]="file.key" />
+          @if (error(file.key)) {
+            <small class="text-red-600">{{ 'judge-confirmation.form.file-required' | lang }}</small>
+          }
+        </div>
+      }
+    </fieldset>
+
+    <p class="m-0 text-xs text-surface-500">{{ 'judge-confirmation.form.required-hint' | lang }}</p>
+
+    <div class="flex flex-wrap justify-end gap-2">
+      @if (cancellable()) {
+        <p-button
+          severity="secondary"
+          [text]="true"
+          [label]="'shell.actions.cancel' | lang"
+          [disabled]="busy() !== null"
+          (onClick)="cancelled.emit()"
+        />
+      }
+      <p-button
+        icon="pi pi-save"
+        severity="secondary"
+        [outlined]="true"
+        [label]="'judge-confirmation.form.save' | lang"
+        [loading]="busy() === 'save'"
+        [disabled]="busy() !== null"
+        (onClick)="save()"
+      />
+      <p-button
+        type="submit"
+        icon="pi pi-send"
+        [label]="'judge-confirmation.form.submit' | lang"
+        [loading]="busy() === 'submit'"
+        [disabled]="busy() !== null"
+      />
+    </div>
+  </form>
+</section>

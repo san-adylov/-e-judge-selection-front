@@ -1,0 +1,52 @@
+{
+  "button": {
+    "save": "Сактоо",
+    "next": "Кийинки",
+    "skip": "Өткөрүп салуу",
+    "create-app": "Арыз берүү"
+  },
+  "input": {
+    "home-address": "Үй дареги",
+    "home-phone": "Үй телефону",
+    "work-phone": "Жумуш телефону",
+    "email": "Электрондук почта",
+    "contact-person": "Байланыш үчүн жооптуу адамдын телефон номери",
+    "language-label": "Конкурстук тандоодон өтүү үчүн артыкчылыктуу тил",
+    "language-kg": "Кыргыз тили",
+    "language-ru": "Орус тили",
+    "tin": "Жеке идентификациялык номери (ИНН/ПИН)",
+    "photo" : "Сүрөт",
+    "choose" : "Тандоо",
+    "delete" : "Өчүрүү",
+    "edit" : "Өзгөртүү",
+    "last-name": "Фамилиясы",
+    "first-name": "Аты",
+    "middle-name": "Атасынын аты",
+    "birth-date": "Туулган күнү",
+    "citizenship": "Жарандыгы",
+    "marital-status": "Үй-бүлөлүк абалы",
+    "marital-single": "Бойдок",
+    "marital-married": "Үйлөнгөн / Турмушка чыккан",
+    "marital-divorced": "Ажырашкан",
+    "birth-place": "Туулган жери",
+    "gender-label": "Жынысы",
+    "gender-male": "Эркек",
+    "gender-female": "Аял",
+    "phone": "Телефон",
+    "residential-address": "Үй каттоосу боюнча дареги",
+    "birth-certificate-place": "Туулгандыгы жөнүндө күбөлүктө көрсөтүлгөн туулган жери",
+    "place-of-actual-residence": "Иш жүзүндө жашаган жери",
+    "additional-phone": "Кошумча телефон",
+    "additional-email": "Кошумча электрондук почта",
+    "additional-information": "Кошумча маалымат",
+    "application-date": "Арыз берилген күн",
+    "char-limit-reached": "1000 белги чегине жетти, мындан ары киргизүүгө болбойт"
+  },
+  "status-chip": {
+    "new": "Жаңы",
+    "pending": "Күтүүдө",
+    "rejected": "Четке кагылган",
+    "approved": "Кабыл алынган",
+    "not-set": "Статус жок"
+  }
+}

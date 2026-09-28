@@ -1,0 +1,111 @@
+{
+  "application": {
+    "NEW": "Черновик",
+    "PENDING_SECRETARY_REVIEW": "Ожидает регистрации",
+    "RETURNED_FOR_CORRECTION": "Возвращена на доработку",
+    "PENDING_BOARD_REVIEW": "Зарегистрировано",
+    "REJECTED_BY_BOARD": "Отклонена советом",
+    "APPROVED_AWAITING_TEST": "Одобрена, ожидает тестирование",
+    "TEST_IN_PROGRESS": "Проходит тестирование",
+    "TEST_FAILED": "Тест не пройден",
+    "NO_SHOW_TEST": "Неявка на тестирование",
+    "REJECTED_AFTER_TEST": "Отклонена после тестирования",
+    "PENDING_ESSAY": "Ожидает начала письменного задания",
+    "NO_SHOW_ESSAY": "Неявка на письменное задание",
+    "PENDING_INTERVIEW": "Ожидает собеседования",
+    "APPROVED": "Одобрена",
+    "REJECTED_AFTER_INTERVIEW": "Отклонена (собеседование)",
+    "WITHDRAWN_BY_CANDIDATE": "Отозвано кандидатом",
+    "CANCELLED": "Отменена"
+  },
+  "visible": {
+    "NO_APPLICATION": "Заявка не подана",
+    "DRAFT": "Черновик",
+    "APPLY": "Заявка подана",
+    "NOT_APPLY": "Участие завершено"
+  },
+  "contest": {
+    "CREATED": "Создан",
+    "PENDING_OPENING": "Ожидает открытия",
+    "READY_TO_PUBLISH": "Готов к публикации",
+    "PUBLISHED": "Опубликован",
+    "PENDING_DOCUMENT_REVIEW": "Ожидает проверки документов",
+    "DOCUMENT_REVIEW_APPROVED": "Документы проверены",
+    "PENDING_CALENDAR_APPROVAL": "Ожидает утверждения плана",
+    "CALENDAR_APPROVED": "Календарный план утверждён",
+    "PENDING_INTERVIEW": "Ожидает собеседования",
+    "INTERVIEW_COMPLETED": "Собеседование завершено",
+    "PENDING_CLOSURE": "Ожидает закрытия",
+    "COMPLETED": "Завершён",
+    "CANCELLED": "Отменён"
+  },
+  "contestType": {
+    "RESERVE": "В резерв судей",
+    "SUPREME_COURT": "Верховный суд",
+    "CONSTITUTIONAL_COURT": "Конституционный суд"
+  },
+  "vacancy": {
+    "DRAFT": "Черновик",
+    "READY_TO_PUBLISH": "Готова к публикации",
+    "PUBLISHED": "Опубликована",
+    "REVIEW": "Рассмотрение",
+    "CLOSED": "Закрыта",
+    "CANCELLED": "Отменена"
+  },
+  "vacancyApplication": {
+    "DRAFT": "Предложение",
+    "SUBMITTED": "Согласие отправлено",
+    "APPROVED": "Назначен",
+    "REJECTED": "Отклонено",
+    "WITHDRAWN": "Отказ",
+    "RESERVE_EXPIRED": "Срок резерва истёк"
+  },
+  "reserve": {
+    "ACTIVE": "В резерве",
+    "SUBMITTED": "Предложена вакансия",
+    "APPROVED": "Одобрен",
+    "REJECTED": "Отклонён",
+    "EXCLUDED": "Исключён из резерва",
+    "APPOINTED": "Назначен",
+    "CONFIRMED": "Назначение подтверждено",
+    "NOT_CONFIRMED": "Назначение не подтверждено"
+  },
+  "complaint": {
+    "SUBMITTED": "Подана",
+    "UNDER_REVIEW": "На рассмотрении",
+    "APPROVED": "Удовлетворена",
+    "REJECTED": "Отклонена"
+  },
+  "complaintType": {
+    "DOCUMENT_STAGE": "Оценка документов",
+    "TEST_RESULT": "Результаты тестирования",
+    "CONTEST_VIOLATION": "Нарушение конкурса"
+  },
+  "judgeApplication": {
+    "DRAFT": "Черновик",
+    "PENDING_SECRETARY_REVIEW": "Ожидает проверки секретаря",
+    "REGISTERED": "Зарегистрирована",
+    "PENDING_DOCUMENT_REVIEW": "Проверка документов",
+    "REJECTED_AFTER_DOCUMENT_REVIEW": "Отклонено (документы)",
+    "APPROVED_AFTER_DOCUMENT_REVIEW": "Допущен (документы)",
+    "PENDING_ASSESSMENT_APPROVAL": "Утверждение оценки",
+    "REJECTED_ASSESSMENT_APPROVAL": "Отклонено (проф. оценка)",
+    "APPROVED_ASSESSMENT_APPROVAL": "Одобрено (проф. оценка)",
+    "PENDING_INTERVIEW": "Собеседование",
+    "REJECTED_AFTER_INTERVIEW": "Отклонено (собеседование)",
+    "APPROVED_AFTER_INTERVIEW": "Одобрено (собеседование)"
+  },
+  "judgeConfirmation": {
+    "CREATED": "Черновик",
+    "PENDING_SECRETARY_REVIEW": "Ожидает проверки секретаря",
+    "UNDER_REVIEW": "На рассмотрении",
+    "APPROVED": "Статус подтверждён",
+    "REJECTED": "Отказано"
+  },
+  "meeting": {
+    "APPOINTED": "Назначено",
+    "OPENED": "Открыто",
+    "APPROVED": "Утверждено",
+    "DECLINED": "Отклонено"
+  }
+}

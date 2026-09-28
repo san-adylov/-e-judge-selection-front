@@ -1,0 +1,7 @@
+/dist
+/coverage
+/.angular
+/playwright-report
+/test-results
+src/domain/api/*.schema.ts
+package-lock.json

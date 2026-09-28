@@ -1,0 +1,116 @@
+{
+  "languages": {
+    "kyrgyz": "Кыргызча",
+    "russian": "Орусча"
+  },
+
+  "countries": {
+    "kg": "Кыргыз Республикасы",
+    "ru": "Россия Федерациясы",
+    "kz": "Казакстан Республикасы",
+    "uz": "Өзбекстан Республикасы",
+    "tr": "Түркия Республикасы",
+    "us": "Америка Кошмо Штаттары",
+    "de": "Германия",
+    "other": "Башка"
+  },
+
+  "cities": {
+    "bishkek": "Бишкек",
+    "osh": "Ош",
+    "jalalabad": "Жалал-Абад",
+    "other": "Башка"
+  },
+
+  "genders": {
+    "male": "Эркек",
+    "female": "Аял"
+  },
+
+  "marital-status": {
+    "single": "Бойдок / турмушка чыга элек",
+    "married": "Үй-бүлөлүү",
+    "divorced": "Ажырашкан"
+  },
+
+  "degree-types": {
+    "bachelor": "Бакалавр",
+    "specialist": "Адис",
+    "master": "Магистр",
+    "doctorate": "PhD / докторантура"
+  },
+
+  "education-forms": {
+    "full-time": "Күндүзгү",
+    "part-time": "Сырттан окуу",
+    "evening": "Кечки",
+    "distance": "Аралыктан окуу"
+  },
+
+  "award-types": {
+    "state": "Мамлекеттик сыйлык",
+    "departmental": "Ведомстволук сыйлык",
+    "corporate": "Корпоративдик сыйлык",
+    "academic": "Илимий / академиялык",
+    "other": "Башка"
+  },
+
+  "degree-levels": {
+    "bachelor": "Бакалавр",
+    "master": "Магистр",
+    "specialist": "Адис",
+    "phd": "PhD",
+    "doctorate": "Илимдин доктору"
+  },
+
+  "relation-types": {
+    "father": "Ата",
+    "mother": "Эне",
+    "son": "Уул",
+    "daughter": "Кыз",
+    "adoptive-father": "Асырап алуучу ата",
+    "adoptive-mother": "Асырап алуучу эне",
+    "adopted-son": "Асырап алынган уул",
+    "adopted-daughter": "Асырап алынган кыз",
+    "brother": "Өз бир тууган ага/ини",
+    "sister": "Өз бир тууган эже/сиңди",
+    "husband": "Жолдош",
+    "wife": "Жубай"
+  },
+
+  "employment-types": {
+    "employed": "Жалданма ишкер",
+    "self-employed": "Жеке ишкер (ИП)",
+    "business-owner": "Ишкер",
+    "retired": "Пенсионер",
+    "student": "Студент",
+    "unemployed": "Ишсиз",
+    "other": "Башка"
+  },
+
+  "relative-statuses": {
+    "active": "Активдүү",
+    "deleted": "Өчүрүлгөн"
+  },
+
+  "property-types": {
+    "real-estate": "Кыймылсыз мүлк",
+    "movable": "Кыймылдуу мүлк",
+    "vehicle": "Транспорт",
+    "securities": "Баалуу кагаздар",
+    "business-share": "Бизнеске үлүш",
+    "deposits": "Банктык салымдар",
+    "other": "Башка мүлк"
+  },
+
+  "candidate-statuses": {
+    "ACTIVE": "Катышуучу",
+    "SUBMITTED": "Жөнөтүлдү",
+    "APPROVED": "Вакансияларда ырасталды",
+    "REJECTED": "Четке кагылды",
+    "EXCLUDED": "Чыгарылды",
+    "APPOINTED": "Вакансияга дайындалды",
+    "CONFIRMED": "Ырасталды",
+    "NOT_CONFIRMED": "Ырасталган эмес"
+  }
+}

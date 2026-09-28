@@ -1,0 +1,89 @@
+<app-page-header title="vacancies.title" subtitle="vacancies.subtitle">
+  <p-button
+    icon="pi pi-refresh"
+    severity="secondary"
+    [outlined]="true"
+    [label]="'vacancies.action.refresh' | lang"
+    [loading]="store.vacanciesLoading() || store.applicationsLoading()"
+    (onClick)="store.reload()"
+  />
+</app-page-header>
+
+<div class="max-w-5xl">
+  <p-tabs [(value)]="activeTab" [scrollable]="true">
+    <p-tablist>
+      <p-tab value="available">{{ 'vacancies.tabs.available' | lang }}</p-tab>
+      <p-tab value="applications">
+        <span class="inline-flex items-center gap-2">
+          {{ 'vacancies.tabs.applications' | lang }}
+          @if (offers() > 0) {
+            <span
+              class="inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs text-primary-contrast"
+              [attr.aria-label]="'vacancies.tabs.offers-count' | lang: { count: offers() }"
+            >
+              {{ offers() }}
+            </span>
+          }
+        </span>
+      </p-tab>
+    </p-tablist>
+
+    <p-tabpanels class="!bg-transparent !px-0">
+      <p-tabpanel value="available">
+        <div class="flex flex-col gap-4">
+          @if (store.vacanciesLoading() && !store.vacancies().length) {
+            @for (row of skeletonRows; track row) {
+              <p-skeleton height="12rem" borderRadius="0.75rem" />
+            }
+          } @else {
+            @for (vacancy of store.vacancies(); track vacancy.id) {
+              <app-vacancy-card
+                [vacancy]="vacancy"
+                [action]="actionOf(vacancy)"
+                [contest]="store.contestOf(vacancy.contestId)"
+                [reserve]="store.reserveOf(vacancy.contestId)"
+                [busy]="store.busy() === 'v' + vacancy.id"
+                (apply)="askApply(vacancy)"
+                (openOffer)="activeTab.set('applications')"
+              />
+            } @empty {
+              <app-vacancies-empty kind="available" [inReserve]="inReserve()" />
+            }
+          }
+
+          @if (store.total() > pageSize) {
+            <p-paginator
+              [rows]="pageSize"
+              [first]="store.page() * pageSize"
+              [totalRecords]="store.total()"
+              (onPageChange)="onPage($event)"
+            />
+          }
+        </div>
+      </p-tabpanel>
+
+      <p-tabpanel value="applications">
+        <div class="flex flex-col gap-4">
+          @if (store.applicationsLoading() && !store.applications().length) {
+            @for (row of skeletonRows; track row) {
+              <p-skeleton height="10rem" borderRadius="0.75rem" />
+            }
+          } @else {
+            @for (application of store.applications(); track application.id) {
+              <app-vacancy-application-card
+                [application]="application"
+                [contest]="contestOfApplication(application)"
+                [vacancyName]="vacancyName(application)"
+                [busy]="store.busy() === 'a' + application.id"
+                (confirm)="askConfirm(application)"
+                (withdraw)="askWithdraw(application)"
+              />
+            } @empty {
+              <app-vacancies-empty kind="applications" [inReserve]="inReserve()" />
+            }
+          }
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>

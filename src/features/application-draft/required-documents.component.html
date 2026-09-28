@@ -1,0 +1,88 @@
+<div class="flex flex-col gap-3">
+  <p class="m-0 text-sm text-surface-600">{{ 'wizard.documents.hint' | lang }}</p>
+
+  @if (store.failed()) {
+    <div class="flex flex-wrap items-center gap-2">
+      <p-message severity="error" [text]="'wizard.dossier-failed' | lang" />
+      <p-button icon="pi pi-refresh" [text]="true" [label]="'wizard.retry' | lang" (onClick)="store.load()" />
+    </div>
+  } @else if (store.loading()) {
+    @for (row of [1, 2, 3]; track row) {
+      <p-skeleton height="3.5rem" />
+    }
+  } @else {
+    @if (missing() > 0) {
+      <p-message severity="warn" [text]="'wizard.documents.missing' | lang: { count: missing() }" />
+    } @else if (rows().length) {
+      <p-message severity="success" [text]="'wizard.documents.all-attached' | lang" />
+    }
+
+    <ul class="m-0 flex list-none flex-col gap-2 p-0">
+      @for (row of rows(); track row.typeId) {
+        <li class="flex flex-wrap items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-3 tablet:p-4">
+          <i
+            class="pi shrink-0"
+            [class.pi-check-circle]="row.attached"
+            [class.text-green-600]="row.attached"
+            [class.pi-exclamation-circle]="!row.attached"
+            [class.text-orange-500]="!row.attached"
+          ></i>
+          <div class="flex min-w-0 flex-1 flex-col gap-1">
+            <span class="font-medium">{{ typeName(row.typeId) }}</span>
+            @for (document of row.documents; track document.id) {
+              @if (document.fileId; as fileId) {
+                <app-file-link [fileId]="fileId" />
+              }
+            } @empty {
+              <span class="text-sm text-surface-500">{{ 'wizard.documents.not-attached' | lang }}</span>
+            }
+          </div>
+          @if (!readonly()) {
+            <p-button
+              size="small"
+              severity="secondary"
+              [outlined]="row.attached"
+              [icon]="row.attached ? 'pi pi-plus' : 'pi pi-upload'"
+              [label]="(row.attached ? 'wizard.documents.add-more' : 'wizard.documents.attach') | lang"
+              (onClick)="open(row)"
+            />
+          }
+        </li>
+      } @empty {
+        <li class="rounded-xl border border-dashed border-surface-300 p-6 text-center text-surface-500">
+          {{ 'wizard.documents.none-required' | lang }}
+        </li>
+      }
+    </ul>
+  }
+</div>
+
+<p-dialog
+  [visible]="adding() !== null"
+  [modal]="true"
+  [draggable]="false"
+  [header]="adding() ? typeName(adding()!.typeId) : ''"
+  [style]="{ width: '32rem' }"
+  [breakpoints]="{ '720px': '95vw' }"
+  (visibleChange)="!$event && close()"
+>
+  <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="save()">
+    <div class="flex flex-col gap-1">
+      <span class="text-sm font-medium">{{ 'shell.files.file' | lang }} *</span>
+      <app-file-upload category="CANDIDATE_DOCUMENT" formControlName="fileId" />
+      @if (form.controls.fileId.touched && form.controls.fileId.invalid) {
+        <small class="text-red-600">{{ 'wizard.documents.file-required' | lang }}</small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="document-note" class="text-sm font-medium">{{ 'wizard.documents.note' | lang }}</label>
+      <textarea pTextarea id="document-note" rows="3" class="w-full" formControlName="additionalInfo"></textarea>
+    </div>
+
+    <div class="flex justify-end gap-2">
+      <p-button severity="secondary" [outlined]="true" [label]="'shell.actions.cancel' | lang" (onClick)="close()" />
+      <p-button type="submit" [label]="'shell.actions.save' | lang" [loading]="saving()" />
+    </div>
+  </form>
+</p-dialog>

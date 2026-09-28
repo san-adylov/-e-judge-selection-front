@@ -1,0 +1,292 @@
+<form class="flex flex-col gap-6" [formGroup]="form" (ngSubmit)="submit()">
+  <fieldset class="m-0 grid grid-cols-1 gap-4 border-0 p-0 tablet:grid-cols-2 desktop-s:grid-cols-3">
+    <legend class="mb-3 p-0 text-base font-semibold">{{ 'personal.groups.main' | lang }}</legend>
+
+    <app-personal-field
+      label="personal.field.lastName"
+      inputId="pd-lastName"
+      [required]="true"
+      [control]="form.controls.lastName"
+    >
+      <input pInputText id="pd-lastName" autocomplete="family-name" formControlName="lastName" />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.firstName"
+      inputId="pd-firstName"
+      [required]="true"
+      [control]="form.controls.firstName"
+    >
+      <input pInputText id="pd-firstName" autocomplete="given-name" formControlName="firstName" />
+    </app-personal-field>
+    <app-personal-field label="personal.field.middleName" inputId="pd-middleName" [control]="form.controls.middleName">
+      <input pInputText id="pd-middleName" autocomplete="additional-name" formControlName="middleName" />
+    </app-personal-field>
+
+    <app-personal-field
+      label="personal.field.birthDate"
+      inputId="pd-birthDate"
+      [required]="true"
+      [control]="form.controls.birthDate"
+    >
+      <p-datepicker
+        inputId="pd-birthDate"
+        dateFormat="dd.mm.yy"
+        appendTo="body"
+        styleClass="w-full"
+        [showIcon]="true"
+        [maxDate]="today"
+        formControlName="birthDate"
+      />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.gender"
+      inputId="pd-gender"
+      [required]="true"
+      [control]="form.controls.gender"
+    >
+      <p-select
+        inputId="pd-gender"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [options]="genders()"
+        formControlName="gender"
+      />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.maritalStatus"
+      inputId="pd-maritalStatus"
+      [control]="form.controls.maritalStatus"
+    >
+      <p-select
+        inputId="pd-maritalStatus"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [showClear]="true"
+        [options]="maritalStatuses()"
+        formControlName="maritalStatus"
+      />
+    </app-personal-field>
+
+    <app-personal-field
+      label="personal.field.citizenshipId"
+      inputId="pd-citizenshipId"
+      [control]="form.controls.citizenshipId"
+    >
+      <p-select
+        inputId="pd-citizenshipId"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [filter]="true"
+        [showClear]="true"
+        [options]="citizenships()"
+        formControlName="citizenshipId"
+      />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.nationalityId"
+      inputId="pd-nationalityId"
+      [control]="form.controls.nationalityId"
+    >
+      <p-select
+        inputId="pd-nationalityId"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [filter]="true"
+        [showClear]="true"
+        [options]="nationalities()"
+        formControlName="nationalityId"
+      />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.preferredLanguage"
+      inputId="pd-preferredLanguage"
+      [control]="form.controls.preferredLanguage"
+    >
+      <p-select
+        inputId="pd-preferredLanguage"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [showClear]="true"
+        [options]="languages()"
+        formControlName="preferredLanguage"
+      />
+    </app-personal-field>
+
+    <app-personal-field
+      class="col-span-full"
+      label="personal.field.birthPlace"
+      inputId="pd-birthPlace"
+      [control]="form.controls.birthPlace"
+    >
+      <input pInputText id="pd-birthPlace" formControlName="birthPlace" />
+    </app-personal-field>
+  </fieldset>
+
+  <fieldset class="m-0 grid grid-cols-1 gap-4 border-0 p-0 tablet:grid-cols-2">
+    <legend class="mb-3 p-0 text-base font-semibold">{{ 'personal.groups.contacts' | lang }}</legend>
+
+    <app-personal-field
+      label="personal.field.phoneNumber"
+      inputId="pd-phoneNumber"
+      hint="personal.hints.phone"
+      [control]="form.controls.phoneNumber"
+    >
+      <input pInputText id="pd-phoneNumber" type="tel" autocomplete="tel" formControlName="phoneNumber" />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.additionalPhoneNumber"
+      inputId="pd-additionalPhoneNumber"
+      [control]="form.controls.additionalPhoneNumber"
+    >
+      <input pInputText id="pd-additionalPhoneNumber" type="tel" formControlName="additionalPhoneNumber" />
+    </app-personal-field>
+    <app-personal-field label="personal.field.email" inputId="pd-email" [control]="form.controls.email">
+      <input pInputText id="pd-email" type="email" autocomplete="email" formControlName="email" />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.additionalEmail"
+      inputId="pd-additionalEmail"
+      [control]="form.controls.additionalEmail"
+    >
+      <input pInputText id="pd-additionalEmail" type="email" formControlName="additionalEmail" />
+    </app-personal-field>
+  </fieldset>
+
+  <fieldset class="m-0 grid grid-cols-1 gap-4 border-0 p-0 tablet:grid-cols-2">
+    <legend class="mb-3 p-0 text-base font-semibold">{{ 'personal.groups.address' | lang }}</legend>
+
+    <app-personal-field label="personal.field.regionId" inputId="pd-regionId" [control]="form.controls.regionId">
+      <p-select
+        inputId="pd-regionId"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [filter]="true"
+        [showClear]="true"
+        [options]="regions()"
+        formControlName="regionId"
+      />
+    </app-personal-field>
+    <app-personal-field label="personal.field.districtId" inputId="pd-districtId" [control]="form.controls.districtId">
+      <p-select
+        inputId="pd-districtId"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [filter]="true"
+        [showClear]="true"
+        [virtualScroll]="districts().length > 100"
+        [virtualScrollItemSize]="40"
+        [options]="districts()"
+        formControlName="districtId"
+      />
+    </app-personal-field>
+    <app-personal-field label="personal.field.cityId" inputId="pd-cityId" [control]="form.controls.cityId">
+      <p-select
+        inputId="pd-cityId"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [filter]="true"
+        [showClear]="true"
+        [virtualScroll]="cities().length > 100"
+        [virtualScrollItemSize]="40"
+        [options]="cities()"
+        formControlName="cityId"
+      />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.streetId"
+      inputId="pd-streetId"
+      [hint]="form.controls.cityId.value === null ? 'personal.hints.street' : null"
+      [control]="form.controls.streetId"
+    >
+      <p-select
+        inputId="pd-streetId"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [filter]="true"
+        [showClear]="true"
+        [virtualScroll]="streets().length > 100"
+        [virtualScrollItemSize]="40"
+        [readonly]="form.controls.cityId.value === null"
+        [options]="streets()"
+        formControlName="streetId"
+      />
+    </app-personal-field>
+    <app-personal-field label="personal.field.postalCode" inputId="pd-postalCode" [control]="form.controls.postalCode">
+      <input pInputText id="pd-postalCode" autocomplete="postal-code" formControlName="postalCode" />
+    </app-personal-field>
+
+    <app-personal-field
+      class="col-span-full"
+      label="personal.field.residentialAddress"
+      inputId="pd-residentialAddress"
+      [control]="form.controls.residentialAddress"
+    >
+      <input pInputText id="pd-residentialAddress" formControlName="residentialAddress" />
+    </app-personal-field>
+    <app-personal-field
+      class="col-span-full"
+      label="personal.field.actualAddress"
+      inputId="pd-actualAddress"
+      [control]="form.controls.actualAddress"
+    >
+      <input pInputText id="pd-actualAddress" formControlName="actualAddress" />
+    </app-personal-field>
+  </fieldset>
+
+  <fieldset class="m-0 flex flex-col gap-4 border-0 p-0">
+    <legend class="mb-3 p-0 text-base font-semibold">{{ 'personal.groups.extra' | lang }}</legend>
+
+    <app-personal-field
+      label="personal.field.fileId"
+      inputId="pd-fileId"
+      hint="personal.hints.file"
+      [control]="form.controls.fileId"
+    >
+      <app-file-upload id="pd-fileId" category="PERSONAL_INFO" formControlName="fileId" />
+    </app-personal-field>
+    <app-personal-field
+      label="personal.field.additionalInformation"
+      inputId="pd-additionalInformation"
+      [control]="form.controls.additionalInformation"
+    >
+      <textarea
+        pTextarea
+        id="pd-additionalInformation"
+        rows="4"
+        maxlength="4000"
+        formControlName="additionalInformation"
+      ></textarea>
+    </app-personal-field>
+  </fieldset>
+
+  <div class="flex flex-wrap justify-end gap-2">
+    @if (cancellable()) {
+      <p-button
+        severity="secondary"
+        [outlined]="true"
+        [label]="'shell.actions.cancel' | lang"
+        [disabled]="saving()"
+        (onClick)="cancelled.emit()"
+      />
+    }
+    <p-button type="submit" icon="pi pi-check" [label]="'shell.actions.save' | lang" [loading]="saving()" />
+  </div>
+</form>

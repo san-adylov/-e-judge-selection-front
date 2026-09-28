@@ -1,0 +1,62 @@
+<p-stepper class="block" [value]="step()" (valueChange)="goTo($event)">
+  <p-step-list>
+    @for (key of stepKeys; track key; let i = $index) {
+      <p-step [value]="i + 1">
+        <span class="hidden tablet:inline">{{ 'wizard.steps.' + key | lang }}</span>
+      </p-step>
+    }
+  </p-step-list>
+</p-stepper>
+
+<section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+  <h2 class="m-0 mb-4 text-lg font-semibold">{{ step() }}. {{ 'wizard.steps.' + stepKeys[step() - 1] | lang }}</h2>
+
+  @switch (step()) {
+    @case (WIZARD_STEP.contacts) {
+      <app-contacts-step [form]="form" [locked]="contactsLocked()" />
+    }
+    @case (WIZARD_STEP.dossier) {
+      <app-dossier-check />
+    }
+    @case (WIZARD_STEP.answers) {
+      <app-additional-answers [binding]="binding()" />
+    }
+    @case (WIZARD_STEP.documents) {
+      <app-required-documents [requiredTypeIds]="contest()?.requiredDocumentTypeIds" />
+    }
+    @case (WIZARD_STEP.review) {
+      <app-review-step
+        [application]="application()"
+        [contest]="contest()"
+        [contacts]="contacts()"
+        [contactsValid]="contactsValid()"
+        [dossierComplete]="dossier.complete()"
+        [missingDocuments]="missingDocuments()"
+        [unanswered]="unanswered()"
+        [sending]="sending()"
+        (edit)="goTo($event)"
+        (send)="send()"
+      />
+    }
+  }
+
+  @if (step() !== WIZARD_STEP.review) {
+    <div class="mt-6 flex justify-between gap-2 border-t border-surface-100 pt-4">
+      <p-button
+        icon="pi pi-arrow-left"
+        severity="secondary"
+        [text]="true"
+        [label]="'wizard.nav.back' | lang"
+        [disabled]="step() === WIZARD_STEP.contacts"
+        (onClick)="goTo(step() - 1)"
+      />
+      <p-button
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [label]="'wizard.nav.next' | lang"
+        [loading]="saving()"
+        (onClick)="next()"
+      />
+    </div>
+  }
+</section>

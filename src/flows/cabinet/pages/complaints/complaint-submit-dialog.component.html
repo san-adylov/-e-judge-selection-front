@@ -1,0 +1,122 @@
+<p-dialog
+  styleClass="w-full max-w-2xl mx-4"
+  [modal]="true"
+  [header]="'complaints.form.title' | lang"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+>
+  @if (loading()) {
+    <div class="flex flex-col gap-4">
+      <p-skeleton height="2.75rem" />
+      <p-skeleton height="2.75rem" />
+      <p-skeleton height="8rem" />
+    </div>
+  } @else if (!eligible().length) {
+    <p-message severity="info" icon="pi pi-info-circle" [text]="'complaints.form.no-eligible' | lang" />
+    <div class="mt-6 flex justify-end">
+      <p-button severity="secondary" [label]="'shell.actions.cancel' | lang" (onClick)="visible.set(false)" />
+    </div>
+  } @else {
+    <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()">
+      @if (presetUnavailable()) {
+        <p-message
+          severity="warn"
+          icon="pi pi-exclamation-triangle"
+          [text]="'complaints.form.preset-unavailable' | lang"
+        />
+      }
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium" for="complaint-application">
+          {{ 'complaints.form.application' | lang }} <span class="text-red-600">*</span>
+        </label>
+        <p-select
+          inputId="complaint-application"
+          optionLabel="label"
+          optionValue="id"
+          appendTo="body"
+          styleClass="w-full"
+          [options]="eligible()"
+          [placeholder]="'complaints.form.application-placeholder' | lang"
+          [invalid]="invalid('applicationId')"
+          formControlName="applicationId"
+        />
+        @if (invalid('applicationId')) {
+          <small class="text-red-600">{{ 'complaints.form.required' | lang }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium" for="complaint-type">
+          {{ 'complaints.form.type' | lang }} <span class="text-red-600">*</span>
+        </label>
+        <p-select
+          inputId="complaint-type"
+          optionLabel="value"
+          optionValue="value"
+          appendTo="body"
+          styleClass="w-full"
+          [options]="typeOptions()"
+          [placeholder]="'complaints.form.type-placeholder' | lang"
+          [invalid]="invalid('type')"
+          formControlName="type"
+        >
+          <ng-template #selectedItem let-option>
+            {{ 'status.complaintType.' + option.value | lang }}
+          </ng-template>
+          <ng-template #item let-option>
+            {{ 'status.complaintType.' + option.value | lang }}
+          </ng-template>
+        </p-select>
+        @if (invalid('type')) {
+          <small class="text-red-600">{{ 'complaints.form.required' | lang }}</small>
+        }
+        @if (deadline(); as date) {
+          <small class="text-surface-600">
+            <i class="pi pi-clock mr-1 text-xs"></i
+            >{{ 'complaints.form.deadline' | lang: { date: (date | localDate) } }}
+          </small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium" for="complaint-text">
+          {{ 'complaints.form.text' | lang }} <span class="text-red-600">*</span>
+        </label>
+        <textarea
+          id="complaint-text"
+          pTextarea
+          rows="8"
+          class="w-full"
+          [autoResize]="true"
+          [maxlength]="textMax"
+          [placeholder]="'complaints.form.text-placeholder' | lang"
+          [invalid]="invalid('text')"
+          formControlName="text"
+        ></textarea>
+        <div class="flex items-start gap-2 text-xs">
+          <span class="flex-1">
+            @if (form.controls.text.hasError('maxlength')) {
+              <span class="text-red-600">{{ 'complaints.form.too-long' | lang: { max: textMax } }}</span>
+            } @else if (invalid('text')) {
+              <span class="text-red-600">{{ 'complaints.form.required' | lang }}</span>
+            } @else {
+              <span class="text-surface-500">{{ 'complaints.form.no-attachments' | lang }}</span>
+            }
+          </span>
+          <span class="shrink-0 text-surface-500">{{ textLength() }} / {{ textMax }}</span>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap justify-end gap-2">
+        <p-button
+          severity="secondary"
+          [text]="true"
+          [label]="'shell.actions.cancel' | lang"
+          (onClick)="visible.set(false)"
+        />
+        <p-button type="submit" icon="pi pi-send" [label]="'complaints.actions.send' | lang" [loading]="saving()" />
+      </div>
+    </form>
+  }
+</p-dialog>

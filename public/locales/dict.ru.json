@@ -1,0 +1,116 @@
+{
+  "languages": {
+    "kyrgyz": "Кыргызский",
+    "russian": "Русский"
+  },
+
+  "countries": {
+    "kg": "Кыргызская Республика",
+    "ru": "Российская Федерация",
+    "kz": "Республика Казахстан",
+    "uz": "Республика Узбекистан",
+    "tr": "Турецкая Республика",
+    "us": "Соединённые Штаты Америки",
+    "de": "Германия",
+    "other": "Другое"
+  },
+
+  "cities": {
+    "bishkek": "Бишкек",
+    "osh": "Ош",
+    "jalalabad": "Джалал-Абад",
+    "other": "Другое"
+  },
+
+  "genders": {
+    "male": "Мужской",
+    "female": "Женский"
+  },
+
+  "marital-status": {
+    "single": "Холостой / не замужем",
+    "married": "Женат / замужем",
+    "divorced": "Разведён(а)"
+  },
+
+  "degree-types": {
+    "bachelor": "Бакалавр",
+    "specialist": "Специалист",
+    "master": "Магистр",
+    "doctorate": "PhD / докторантура"
+  },
+
+  "education-forms": {
+    "full-time": "Очная",
+    "part-time": "Заочная",
+    "evening": "Вечерняя",
+    "distance": "Дистанционная"
+  },
+
+  "award-types": {
+    "state": "Государственная награда",
+    "departmental": "Ведомственная награда",
+    "corporate": "Корпоративная награда",
+    "academic": "Научная / академическая",
+    "other": "Иное поощрение"
+  },
+
+  "degree-levels": {
+    "bachelor": "Бакалавр",
+    "master": "Магистр",
+    "specialist": "Специалист",
+    "phd": "PhD",
+    "doctorate": "Доктор наук"
+  },
+
+  "relation-types": {
+    "father": "Отец",
+    "mother": "Мать",
+    "son": "Сын",
+    "daughter": "Дочь",
+    "adoptive-father": "Усыновитель",
+    "adoptive-mother": "Усыновительница",
+    "adopted-son": "Усыновленный",
+    "adopted-daughter": "Усыновленная",
+    "brother": "Родной брат",
+    "sister": "Родная сестра",
+    "husband": "Супруг",
+    "wife": "Супруга"
+  },
+
+  "employment-types": {
+    "employed": "Работа по найму",
+    "self-employed": "Самозанятый / ИП",
+    "business-owner": "Предприниматель",
+    "retired": "Пенсионер",
+    "student": "Студент",
+    "unemployed": "Безработный",
+    "other": "Другое"
+  },
+
+  "relative-statuses": {
+    "active": "Активен",
+    "deleted": "Удалён"
+  },
+
+  "property-types": {
+    "real-estate": "Недвижимое имущество",
+    "movable": "Движимое имущество",
+    "vehicle": "Транспорт",
+    "securities": "Ценные бумаги",
+    "business-share": "Доля в бизнесе",
+    "deposits": "Банковские вклады",
+    "other": "Другое имущество"
+  },
+
+  "candidate-statuses": {
+    "ACTIVE": "Участник",
+    "SUBMITTED": "Подано",
+    "APPROVED": "Одобрена в вакансиях",
+    "REJECTED": "Отклонено",
+    "EXCLUDED": "Исключён",
+    "APPOINTED": "Назначен на вакансию",
+    "CONFIRMED": "Подтверждено",
+    "NOT_CONFIRMED": "Не подтверждено"
+  }
+}
