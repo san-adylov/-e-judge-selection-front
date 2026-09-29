@@ -29,14 +29,20 @@ export interface OwnApplication {
   status?: ApplicationStatus;
 }
 
+/** Тип конкурса узнать не удалось: такая активная заявка блокирует подачу в конкурсы любого типа. */
+export const UNKNOWN_TYPE = Symbol('UNKNOWN_TYPE');
+
+/** Тип конкурса с активной заявкой: `null` — конкурс без типа, `UNKNOWN_TYPE` — тип неизвестен. */
+export type ActiveType = ContestType | null | typeof UNKNOWN_TYPE;
+
 /**
  * Заявки кандидата, сопоставленные с конкурсами:
  * `applicationIds` — id конкурса → id заявки (в карточке конкурса его нет);
- * `activeTypes` — конкурсы с активной (не финальной) заявкой и их тип (`null` — конкурс без типа).
+ * `activeTypes` — конкурсы с активной (не финальной) заявкой и их тип.
  */
 export interface Participation {
   readonly applicationIds: ReadonlyMap<number, number>;
-  readonly activeTypes: ReadonlyMap<number, ContestType | null>;
+  readonly activeTypes: ReadonlyMap<number, ActiveType>;
 }
 
 export const NO_PARTICIPATION: Participation = { applicationIds: new Map(), activeTypes: new Map() };
@@ -72,24 +78,30 @@ export function isParticipating(visibleStatus: VisibleStatus | null | undefined)
   return !!visibleStatus && visibleStatus !== 'NO_APPLICATION';
 }
 
+/** Заявка не в финальном статусе: её учитывает правило 4102. */
+export function isActiveApplication(status: ApplicationStatus | undefined): boolean {
+  return !!status && !FINAL_APPLICATION_STATUSES.has(status);
+}
+
 /**
  * Сопоставляет заявки кандидата (`GET /contest-application/my`) с конкурсами.
- * `contestTypes` — тип каждого известного конкурса; заявки на неизвестные конкурсы в `activeTypes` не попадают.
+ * `contestTypes` — тип каждого известного конкурса. Бэкенд учитывает заявки в конкурсах любого статуса,
+ * в том числе отменённых (их нет в `/contest/available`), поэтому активная заявка на конкурс неизвестного типа
+ * получает `UNKNOWN_TYPE` и блокирует все типы — иначе кандидат видит «Подать заявку», а бэкенд отказывает 4102.
  */
 export function participationOf(
   applications: readonly OwnApplication[],
   contestTypes: ReadonlyMap<number, ContestType | null>,
 ): Participation {
   const applicationIds = new Map<number, number>();
-  const activeTypes = new Map<number, ContestType | null>();
+  const activeTypes = new Map<number, ActiveType>();
 
   for (const { id, contestId, status } of applications) {
     if (contestId === undefined) continue;
     if (id !== undefined) applicationIds.set(contestId, id);
+    if (!isActiveApplication(status)) continue;
 
-    const active = !!status && !FINAL_APPLICATION_STATUSES.has(status);
-
-    if (active && contestTypes.has(contestId)) activeTypes.set(contestId, contestTypes.get(contestId) ?? null);
+    activeTypes.set(contestId, contestTypes.has(contestId) ? (contestTypes.get(contestId) ?? null) : UNKNOWN_TYPE);
   }
 
   return { applicationIds, activeTypes };
@@ -97,7 +109,7 @@ export function participationOf(
 
 /**
  * `SubmissionRules.requireNoActiveInSameType` (4102): параллельно можно участвовать только в конкурсах разных типов.
- * Конкурсы без типа считаются одним типом.
+ * Конкурсы без типа считаются одним типом; заявка на конкурс неизвестного типа блокирует все.
  */
 export function hasActiveInSameType(
   contest: { id?: number; type?: ContestType | null },
@@ -106,7 +118,7 @@ export function hasActiveInSameType(
   const type = contest.type ?? null;
 
   for (const [contestId, activeType] of participation.activeTypes) {
-    if (contestId !== contest.id && activeType === type) return true;
+    if (contestId !== contest.id && (activeType === UNKNOWN_TYPE || activeType === type)) return true;
   }
 
   return false;
@@ -134,17 +146,24 @@ export function contestAction(state: {
 /**
  * Действие по карточке конкурса из `GET /contest/available` с учётом заявок кандидата и отстранения.
  * Заявка из `/my` тоже считается участием: карточка могла устареть.
+ * `refusedTypes` — типы, по которым бэкенд уже отказал 4102 (`ContestApplyService.refusedTypes`).
  */
 export function actionFor(
   contest: AcceptanceInput & { id?: number; type?: ContestType | null; visibleStatus?: VisibleStatus },
-  context: { today: string; banned: boolean; participation: Participation },
+  context: {
+    today: string;
+    banned: boolean;
+    participation: Participation;
+    refusedTypes?: ReadonlySet<ContestType | null>;
+  },
 ): ContestAction {
   const hasOwn = contest.id !== undefined && context.participation.applicationIds.has(contest.id);
+  const refused = context.refusedTypes?.has(contest.type ?? null) ?? false;
 
   return contestAction({
     participating: isParticipating(contest.visibleStatus) || hasOwn,
     acceptance: acceptanceState(contest, context.today),
     banned: context.banned,
-    activeSameType: hasActiveInSameType(contest, context.participation),
+    activeSameType: refused || hasActiveInSameType(contest, context.participation),
   });
 }

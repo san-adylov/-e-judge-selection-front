@@ -149,6 +149,24 @@ describe('ContestApplyService', () => {
     expect(service.profileHint()).toBeNull();
   });
 
+  it('отказ 4102 запоминает тип конкурса: мешающая заявка может быть не видна фронту', () => {
+    service.apply({ id: 5, type: 'RESERVE' });
+    passBanCheck();
+    backend.expectOne(PROFILE).flush({});
+    backend
+      .expectOne(CREATE)
+      .flush({ errorCode: 4102, message: 'Есть активная заявка' }, { status: 409, statusText: 'Conflict' });
+
+    expect([...service.refusedTypes()]).toEqual(['RESERVE']);
+
+    service.apply({ id: 5, type: 'SUPREME_COURT' });
+    passBanCheck();
+    backend.expectOne(PROFILE).flush({});
+    backend.expectOne(CREATE).flush({ errorCode: 4091, message: 'Уже есть' }, { status: 409, statusText: 'Conflict' });
+
+    expect([...service.refusedTypes()]).toEqual(['RESERVE']);
+  });
+
   it('отказ 4153 — статус отстранения перечитывается', () => {
     service.apply({ id: 5 });
     passBanCheck();

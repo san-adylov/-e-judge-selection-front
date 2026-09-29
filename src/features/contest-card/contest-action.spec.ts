@@ -9,6 +9,7 @@ import {
   NO_PARTICIPATION,
   participationOf,
   serverToday,
+  UNKNOWN_TYPE,
 } from './contest-action';
 
 describe('acceptanceState', () => {
@@ -134,10 +135,20 @@ describe('participationOf / hasActiveInSameType', () => {
     expect(hasActiveInSameType({ id: 2, type: 'RESERVE' }, participation)).toBe(false);
   });
 
-  it('заявка на неизвестный конкурс не учитывается — решит бэкенд', () => {
+  it('активная заявка на конкурс неизвестного типа блокирует все типы (4102 учитывает и отменённые конкурсы)', () => {
     const participation = participationOf([{ id: 10, contestId: 99, status: 'NEW' }], types);
 
-    expect(hasActiveInSameType({ id: 2, type: 'RESERVE' }, participation)).toBe(false);
+    expect(participation.activeTypes.get(99)).toBe(UNKNOWN_TYPE);
+    expect(hasActiveInSameType({ id: 2, type: 'RESERVE' }, participation)).toBe(true);
+    expect(hasActiveInSameType({ id: 3, type: 'SUPREME_COURT' }, participation)).toBe(true);
+    expect(hasActiveInSameType({ id: 99, type: 'RESERVE' }, participation)).toBe(false);
+  });
+
+  it('финальная заявка на неизвестный конкурс ничего не блокирует', () => {
+    const participation = participationOf([{ id: 10, contestId: 99, status: 'CANCELLED' }], types);
+
+    expect(participation.activeTypes.size).toBe(0);
+    expect(participation.applicationIds.get(99)).toBe(10);
   });
 });
 
@@ -175,6 +186,15 @@ describe('actionFor', () => {
       kind: 'unavailable',
       reason: 'active-same-type',
     });
+  });
+
+  it('после отказа 4102 по типу конкурсы этого типа больше не предлагают подачу', () => {
+    const refusedTypes = new Set<ContestType | null>(['RESERVE']);
+    const context = { today, banned: false, participation: NO_PARTICIPATION, refusedTypes };
+
+    expect(actionFor(card, context)).toEqual({ kind: 'unavailable', reason: 'active-same-type' });
+    expect(actionFor({ ...card, id: 3, type: 'SUPREME_COURT' }, context)).toEqual({ kind: 'apply' });
+    expect(actionFor({ ...card, visibleStatus: 'DRAFT' }, context)).toEqual({ kind: 'application' });
   });
 });
 

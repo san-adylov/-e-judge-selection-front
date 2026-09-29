@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LangPipe } from '@reforgium/presentia';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
 
 import type { ContestAction } from './contest-action';
 
 /**
  * Кнопка действия по конкурсу — одна для карточки и детальной страницы:
- * «Подать заявку», «Моя заявка» или неактивная кнопка с причиной.
+ * «Подать заявку», ссылка «Моя заявка» или неактивная кнопка с причиной.
  */
 @Component({
   selector: 'app-contest-action-button',
-  imports: [RouterLink, LangPipe, Button],
+  imports: [RouterLink, LangPipe, Button, ButtonDirective, ButtonIcon, ButtonLabel],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -27,13 +27,11 @@ import type { ContestAction } from './contest-action';
         />
       }
       @case ('application') {
-        <p-button
-          icon="pi pi-file"
-          severity="secondary"
-          styleClass="w-full"
-          [label]="'contests.action.my-application' | lang"
-          [routerLink]="applicationLink()"
-        />
+        <!-- Переход — ссылкой: у <p-button [routerLink]> лишняя остановка Tab и нет href. -->
+        <a pButton severity="secondary" [fluid]="true" [routerLink]="applicationLink()">
+          <i pButtonIcon class="pi pi-file"></i>
+          <span pButtonLabel>{{ 'contests.action.my-application' | lang }}</span>
+        </a>
       }
       @default {
         <p-button

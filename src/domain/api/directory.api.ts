@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, type HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
@@ -33,8 +33,9 @@ export class DirectoryApi {
     return this.http.get<Item[]>(`${BASE}/${code}/all`);
   }
 
-  get(code: DirectoryCode, id: number): Observable<Item> {
-    return this.http.get<Item>(`${BASE}/${code}/${id}`);
+  /** Запись по id, в том числе выключенная (`/all` отдаёт только активные); любому авторизованному. */
+  get(code: DirectoryCode, id: number, context?: HttpContext): Observable<Item> {
+    return this.http.get<Item>(`${BASE}/${code}/${id}`, { context });
   }
 
   create(code: DirectoryCode, body: S['DirectoryItemRequest']): Observable<Item> {

@@ -5,7 +5,7 @@ import { LangService } from '@reforgium/presentia';
 import { ConfirmationService } from 'primeng/api';
 import { catchError, EMPTY, finalize, map, type Observable, of, Subject, switchMap, tap } from 'rxjs';
 
-import type { Schemas } from '@domain/api/api.types';
+import type { ContestType, Schemas } from '@domain/api/api.types';
 import { CandidateProfileApi } from '@domain/api/candidate-profile.api';
 import { ContestApplicationApi } from '@domain/api/contest-application.api';
 import { apiErrorOf } from '@shared/api/api-error';
@@ -61,6 +61,11 @@ export class ContestApplyService {
   readonly pending = signal<number | null>(null);
   /** Конкурс, для которого нужно заполнить личные данные (отказ 4137 или их ещё нет). */
   readonly profileHint = signal<number | null>(null);
+  /**
+   * Типы конкурсов, по которым бэкенд отказал 4102 (`null` — конкурсы без типа). Мешающая заявка может быть
+   * не видна фронту — после отказа такие конкурсы больше не предлагают «Подать заявку».
+   */
+  readonly refusedTypes = signal<ReadonlySet<ContestType | null>>(new Set());
 
   /** Ошибка проверки не мешает работе: окончательно отстранение проверит бэкенд (4153). */
   loadBanStatus(): void {
@@ -68,8 +73,9 @@ export class ContestApplyService {
   }
 
   /** Подтверждение и создание черновика; после отказа 4091, 4102 или по срокам приёма срабатывает `stale`. */
-  apply(contest: { id?: number; name?: string }): void {
+  apply(contest: { id?: number; name?: string; type?: ContestType | null }): void {
     const contestId = contest.id;
+    const type = contest.type ?? null;
 
     if (contestId === undefined || this.pending() !== null || this.banned()) return;
 
@@ -80,11 +86,11 @@ export class ContestApplyService {
       acceptLabel: this.lang.get('contests.apply.confirm-accept'),
       rejectLabel: this.lang.get('shell.actions.cancel'),
       rejectButtonProps: { severity: 'secondary', outlined: true },
-      accept: () => this.create(contestId),
+      accept: () => this.create(contestId, type),
     });
   }
 
-  private create(contestId: number): void {
+  private create(contestId: number, type: ContestType | null): void {
     this.pending.set(contestId);
     this.profileHint.set(null);
 
@@ -114,7 +120,7 @@ export class ContestApplyService {
               : ['/cabinet/applications', application.id, 'edit'],
           );
         },
-        error: (error: unknown) => this.onError(error, contestId),
+        error: (error: unknown) => this.onError(error, contestId, type),
       });
   }
 
@@ -141,11 +147,12 @@ export class ContestApplyService {
       );
   }
 
-  private onError(error: unknown, contestId: number): void {
+  private onError(error: unknown, contestId: number, type: ContestType | null): void {
     const code = apiErrorOf(error)?.errorCode;
 
     if (code === APPLY_ERRORS.PROFILE_INCOMPLETE) this.profileHint.set(contestId);
     if (code === APPLY_ERRORS.BANNED) this.loadBanStatus();
+    if (code === APPLY_ERRORS.ACTIVE_SAME_TYPE) this.refusedTypes.update((types) => new Set(types).add(type));
     if (code !== undefined && STALE_ERRORS.has(code)) this.staleEvents.next();
   }
 }

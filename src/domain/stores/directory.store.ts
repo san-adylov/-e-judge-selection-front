@@ -39,6 +39,13 @@ export class DirectoryStore {
     });
   }
 
+  /** `true`, когда `items(code)` загружен: пустой список до загрузки не отличить от пустого справочника. */
+  loaded(code: DirectoryCode): Signal<boolean> {
+    const state = this.state(code);
+
+    return computed(() => state() !== null);
+  }
+
   invalidate(code: DirectoryCode): void {
     this.cache.delete(code);
   }

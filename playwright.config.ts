@@ -14,6 +14,8 @@ export default defineConfig({
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? [['junit', { outputFile: 'test-results/junit.xml' }], ['html', { open: 'never' }]] : 'list',
   grepInvert: onStand ? undefined : /@stand/,
+  // Первый заход в ленивый маршрут на холодном dev-сервере бывает дольше 5 с.
+  expect: { timeout: 10_000 },
   use: {
     baseURL,
     locale: 'ru-RU',

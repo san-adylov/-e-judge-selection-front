@@ -11,11 +11,20 @@
     <p-skeleton height="2.5rem" width="60%" />
     <p-skeleton height="8rem" borderRadius="0.75rem" />
     <p-skeleton height="14rem" borderRadius="0.75rem" />
+  } @else if (failed()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-exclamation-circle text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'contests.detail.error' | lang }}</p>
+      <p-button icon="pi pi-refresh" [label]="'contests.retry' | lang" (onClick)="retry()" />
+    </section>
   } @else if (notFound() || !summary()) {
     <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
       <i class="pi pi-search text-4xl text-surface-400" aria-hidden="true"></i>
       <p class="m-0 font-medium">{{ 'contests.detail.not-found' | lang }}</p>
-      <p-button icon="pi pi-list" [label]="'contests.detail.back' | lang" routerLink="/cabinet/contests" />
+      <a pButton routerLink="/cabinet/contests">
+        <i pButtonIcon class="pi pi-list"></i>
+        <span pButtonLabel>{{ 'contests.detail.back' | lang }}</span>
+      </a>
     </section>
   } @else {
     @let item = summary()!;
@@ -52,6 +61,21 @@
     @if (limited()) {
       <p-message severity="info" icon="pi pi-info-circle" [text]="'contests.detail.limited' | lang" />
     }
+    @if (participationUnknown()) {
+      <p-message severity="warn" icon="pi pi-exclamation-triangle">
+        <div class="flex flex-col items-start gap-2 text-sm">
+          <span>{{ 'contests.detail.participation-unknown' | lang }}</span>
+          <p-button
+            icon="pi pi-refresh"
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            [label]="'contests.retry' | lang"
+            (onClick)="refresh()"
+          />
+        </div>
+      </p-message>
+    }
 
     <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
       <dl class="m-0 grid grid-cols-1 gap-3 text-sm tablet:grid-cols-2 desktop-s:grid-cols-4">
@@ -75,18 +99,16 @@
         }
       </dl>
       @if (contest()?.announcementFileId; as fileId) {
-        <div class="flex flex-col gap-1 border-t border-surface-200 pt-3 text-sm">
-          <span class="text-surface-500">{{ 'contests.detail.announcement' | lang }}</span>
-          <app-file-link [fileId]="fileId" />
-        </div>
+        <app-contest-announcement [fileId]="fileId" />
       }
     </section>
 
     @for (text of texts(); track text.key) {
-      <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <section class="min-w-0 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
         <h2 class="m-0 mb-3 text-base font-semibold">{{ 'contests.detail.' + text.key | lang }}</h2>
+        <!-- Широкие таблицы и <pre> из редактора прокручиваются внутри блока, а не всю страницу (от 360px). -->
         <div
-          class="text-sm leading-6 break-words [&_a]:text-primary [&_a]:underline [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_table]:w-full [&_ul]:list-disc [&_ul]:pl-5"
+          class="max-w-full overflow-x-auto text-sm leading-6 break-words [&_a]:text-primary [&_a]:underline [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_pre]:whitespace-pre-wrap [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-surface-200 [&_td]:p-2 [&_td]:align-top [&_th]:border [&_th]:border-surface-200 [&_th]:p-2 [&_th]:text-left [&_ul]:list-disc [&_ul]:pl-5"
           [innerHTML]="text.html | safeHtml"
         ></div>
       </section>

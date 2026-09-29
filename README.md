@@ -82,11 +82,12 @@ e2e/                   # Playwright
 Готово: каркас, сборка, CI, слой API (все контроллеры v2), вход тремя способами, сессия, группы доступа, SSE,
 уведомления, дашборд, диалог ОЭП.
 
-Кабинет кандидата (`/cabinet`) перенесён, кроме конкурсов:
+Кабинет кандидата (`/cabinet`) перенесён:
 
 | Экран                                                                          | Маршрут                               | Где                                                                  |
 | ------------------------------------------------------------------------------ | ------------------------------------- | -------------------------------------------------------------------- |
 | Личное дело: личные данные, разделы, импорт дипломов и кадастра, заполненность | `/cabinet/profile`                    | `features/personal-data`, `features/application-wizard`              |
+| Конкурсы: список, карточка, подача заявки                                      | `/cabinet/contests`, `/:id`           | `flows/cabinet/pages/contests`, `features/contest-card`              |
 | Мои заявки: список, карточка, история, действия по статусу, SSE                | `/cabinet/applications`, `/:id`       | `flows/cabinet/pages/applications`, `features/application-status`    |
 | Мастер заявки: контакты, личное дело, анкета, документы, отправка              | `/cabinet/applications/:id/edit`      | `flows/cabinet/pages/application-edit`, `features/application-draft` |
 | Вакансии и предложения из резерва                                              | `/cabinet/vacancies`                  | `flows/cabinet/pages/vacancies`                                      |
@@ -96,7 +97,6 @@ e2e/                   # Playwright
 | Подтверждение статуса судьи                                                    | `/cabinet/judge-confirmation`         | `flows/cabinet/pages/judge-confirmation`                             |
 | Заявки действующего судьи (ACTIVE_JUDGE)                                       | `/cabinet/judge-applications`, `/:id` | `flows/cabinet/pages/judge-applications`                             |
 
-Конкурсы (`/cabinet/contests`) — в работе: логика подачи и карточка в `features/contest-card`, маршрут пока заглушка.
 Экраны `/administrative` и `/testing` подключены через `screen()` в `*.routes.ts`: доступ уже как в v2, вместо
 контента — заглушка со списком маршрутов API. Перенос экрана = замена `loadComponent` на страницу.
 
@@ -108,6 +108,9 @@ e2e/                   # Playwright
 - `vacancyName` в `VacancyApplicationResponse`: кандидату недоступен `GET /vacancy/{id}`, в откликах видно «Вакансия № id».
 - `GET /judge-applications/{id}` для владельца (сейчас только сотрудникам) — карточка ищет заявку в `/my`.
 - Вложения в жалобах: в `SubmitComplaintRequest` нет файла.
+- Файл объявления о конкурсе (`CONTEST_ANNOUNCEMENT`) кандидату недоступен: у него нет владельца, и `FileAccessPolicy.requireReadable`
+  отдаёт его только сотрудникам (403, 4316). Нужно разрешить чтение публичных категорий любому авторизованному или
+  дать скачивание через конкурс; до этого карточка конкурса не показывает ссылку на объявление.
 - Веса этапов и проходной балл для кандидата: значения по умолчанию из `ScoringProperties` зашиты на фронте;
   срок жалобы на этап документов (3 дня) — тоже.
 

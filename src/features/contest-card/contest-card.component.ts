@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LangPipe } from '@reforgium/presentia';
-import { Button } from 'primeng/button';
+import { ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
 
 import type { Schemas } from '@domain/api/api.types';
 import { LocalDatePipe } from '@shared/lib/format.pipes';
@@ -17,7 +17,9 @@ import { ContestProfileHintComponent } from './profile-hint.component';
   imports: [
     RouterLink,
     LangPipe,
-    Button,
+    ButtonDirective,
+    ButtonIcon,
+    ButtonLabel,
     LocalDatePipe,
     StatusTagComponent,
     ContestActionButtonComponent,
@@ -68,14 +70,10 @@ import { ContestProfileHintComponent } from './profile-hint.component';
           [disabled]="disabled()"
           (apply)="apply.emit()"
         />
-        <p-button
-          icon="pi pi-info-circle"
-          severity="secondary"
-          styleClass="w-full"
-          [text]="true"
-          [label]="'contests.card.details' | lang"
-          [routerLink]="['/cabinet/contests', item.id]"
-        />
+        <a pButton severity="secondary" [text]="true" [fluid]="true" [routerLink]="['/cabinet/contests', item.id]">
+          <i pButtonIcon class="pi pi-info-circle"></i>
+          <span pButtonLabel>{{ 'contests.card.details' | lang }}</span>
+        </a>
       </div>
     </article>
   `,

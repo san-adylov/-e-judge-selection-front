@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, type OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { LangPipe } from '@reforgium/presentia';
+import { LangPipe, LangService } from '@reforgium/presentia';
 import { Button } from 'primeng/button';
 import { Paginator, type PaginatorState } from 'primeng/paginator';
 import { Select } from 'primeng/select';
@@ -44,16 +44,13 @@ const CONTEST_TYPES: readonly ContestType[] = ['RESERVE', 'SUPREME_COURT', 'CONS
           class="w-full tablet:w-72"
           optionLabel="label"
           optionValue="value"
-          [options]="typeOptions"
+          [options]="typeOptions()"
           [showClear]="true"
           [placeholder]="'contests.filter.all' | lang"
           [ariaLabel]="'contests.filter.label' | lang"
           [ngModel]="type()"
           (ngModelChange)="setType($event)"
-        >
-          <ng-template #selectedItem let-option>{{ option.label | lang }}</ng-template>
-          <ng-template #item let-option>{{ option.label | lang }}</ng-template>
-        </p-select>
+        />
       </app-page-header>
 
       <div class="flex flex-col gap-4">
@@ -117,11 +114,19 @@ const CONTEST_TYPES: readonly ContestType[] = ['RESERVE', 'SUPREME_COURT', 'CONS
 })
 export default class ContestsPage implements OnInit {
   private readonly loader = inject(CandidateContestsLoader);
+  private readonly lang = inject(LangService);
   private readonly destroyRef = inject(DestroyRef);
   protected readonly flow = inject(ContestApplyService);
 
   protected readonly pageSize = PAGE_SIZE;
-  protected readonly typeOptions = CONTEST_TYPES.map((value) => ({ label: `status.contestType.${value}`, value }));
+  /** `observe` догружает словарь `status` и следит за языком: `p-select` берёт подпись для aria-label и поиска. */
+  private readonly typeLabels = CONTEST_TYPES.map((value) => ({
+    value,
+    label: this.lang.observe(`status.contestType.${value}`),
+  }));
+  protected readonly typeOptions = computed(() =>
+    this.typeLabels.map(({ value, label }) => ({ value, label: label() })),
+  );
   protected readonly loading = signal(true);
   protected readonly failed = signal(false);
   protected readonly contests = signal<ContestCard[]>([]);
@@ -136,7 +141,12 @@ export default class ContestsPage implements OnInit {
   });
 
   protected readonly cards = computed(() => {
-    const context = { today: serverToday(), banned: this.flow.banned(), participation: this.participation() };
+    const context = {
+      today: serverToday(),
+      banned: this.flow.banned(),
+      participation: this.participation(),
+      refusedTypes: this.flow.refusedTypes(),
+    };
     const start = this.page() * PAGE_SIZE;
 
     return this.filtered()
@@ -174,17 +184,19 @@ export default class ContestsPage implements OnInit {
     this.loader
       .load()
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: ({ cards, participation }) => {
-          this.contests.set(cards);
-          this.participation.set(participation);
-          this.page.update((page) => Math.min(page, Math.max(0, Math.ceil(this.filtered().length / PAGE_SIZE) - 1)));
-          this.loading.set(false);
-        },
-        error: () => {
+      .subscribe(({ cards, participation }) => {
+        this.loading.set(false);
+
+        if (!cards) {
           this.failed.set(true);
-          this.loading.set(false);
-        },
+
+          return;
+        }
+
+        this.contests.set(cards);
+        // Без своих заявок список остаётся рабочим: «Моя заявка» — по `visibleStatus`, 4102 проверит бэкенд.
+        this.participation.set(participation ?? NO_PARTICIPATION);
+        this.page.update((page) => Math.min(page, Math.max(0, Math.ceil(this.filtered().length / PAGE_SIZE) - 1)));
       });
   }
 }
