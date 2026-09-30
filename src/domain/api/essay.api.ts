@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, type HttpContext, type HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import type { Observable } from 'rxjs';
+import { map, type Observable } from 'rxjs';
 
 import { environment } from '@shared/config/environment';
 
@@ -11,17 +11,49 @@ const BASE = `${environment.API}/essay`;
 type Submission = S['EssaySubmissionResponse'];
 type Topic = S['EssayTopicResponse'];
 
+/** Ответ вместе со временем сервера из заголовка `Date` (мс с эпохи; `null`, если заголовка нет). */
+export interface Timed<T> {
+  body: T;
+  serverTime: number | null;
+}
+
+/** Время сервера из заголовка `Date` (точность — секунда). */
+export function serverTimeOf(headers: HttpHeaders): number | null {
+  const value = headers.get('Date');
+  const time = value ? Date.parse(value) : Number.NaN;
+
+  return Number.isNaN(time) ? null : time;
+}
+
 /** `EssayCandidateController` + `EssayReviewController` + `EssayTopicController`. */
 @Injectable({ providedIn: 'root' })
 export class EssayApi {
   private readonly http = inject(HttpClient);
 
+  /**
+   * Своя работа: тема, срок, ответы (они приходят только после отправки). С токеном этапа `exerciseId` —
+   * это id работы (`EssaySubmission`), `applicationId` не нужен; с обычным токеном кандидата — обязателен.
+   */
   my(applicationId?: number): Observable<Submission> {
     return this.http.get<Submission>(`${BASE}/my`, { params: toParams({ applicationId }) });
   }
 
-  reply(body: S['EssayReplyRequest'], applicationId?: number): Observable<Submission> {
-    return this.http.put<Submission>(`${BASE}/my/reply`, body, { params: toParams({ applicationId }) });
+  /** То же, что `my()`, плюс время сервера — таймер не зависит от часов устройства. */
+  myTimed(applicationId?: number): Observable<Timed<Submission>> {
+    return this.http
+      .get<Submission>(`${BASE}/my`, { params: toParams({ applicationId }), observe: 'response' })
+      .pipe(map((response) => ({ body: response.body ?? {}, serverTime: serverTimeOf(response.headers) })));
+  }
+
+  /**
+   * Все ответы разом и только один раз: повтор → 4135, после срока → 4313. Черновиков на сервере нет.
+   * `context` — например, `skipErrorToast()` для автоотправки с повторами.
+   */
+  reply(body: S['EssayReplyRequest'], applicationId?: number, context?: HttpContext): Observable<Submission> {
+    return this.http.put<Submission>(`${BASE}/my/reply`, body, {
+      params: toParams({ applicationId }),
+      ...(context ? { context } : {}),
+    });
   }
 
   /** Очередь эссе на проверку текущему члену Совета. */

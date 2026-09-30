@@ -1,0 +1,108 @@
+<div
+  class="sticky top-16 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-surface-200 bg-surface-0 p-3 shadow-sm tablet:p-4"
+>
+  <app-essay-timer [seconds]="store.remaining()" [level]="store.level()" />
+
+  <p class="m-0 min-w-0 flex-1 text-xs text-surface-500" aria-live="polite" aria-atomic="true">
+    @if (store.saveFailed()) {
+      <span class="text-red-700">
+        <i class="pi pi-exclamation-triangle mr-1" aria-hidden="true"></i>{{ 'essay.save.failed' | lang }}
+      </span>
+    } @else if (savedTime(); as time) {
+      <i class="pi pi-check mr-1" aria-hidden="true"></i>{{ 'essay.save.saved' | lang: { time } }}
+    } @else {
+      {{ 'essay.save.none' | lang }}
+    }
+  </p>
+
+  <!-- Панель закреплена под шапкой оболочки (h-16); на телефоне кнопка только внизу, чтобы панель была низкой. -->
+  <p-button
+    icon="pi pi-send"
+    class="hidden tablet:block"
+    [label]="'essay.submit.button' | lang"
+    [loading]="store.phase() === 'submitting'"
+    [disabled]="store.readonly()"
+    (onClick)="askSubmit()"
+  />
+</div>
+
+@if (store.phase() === 'submitting') {
+  <p-message severity="info" icon="pi pi-spin pi-spinner" [text]="'essay.submit.sending' | lang" />
+} @else if (store.level() !== 'normal') {
+  <p-message
+    [severity]="store.level() === 'danger' ? 'error' : 'warn'"
+    [text]="'essay.timer.banner-' + store.level() | lang: { seconds: autoSubmitSeconds }"
+  />
+}
+
+<section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5" aria-labelledby="essay-theme-title">
+  <h1 id="essay-theme-title" class="m-0 text-xs font-medium tracking-wide text-surface-500 uppercase">
+    {{ 'essay.writing.theme' | lang }}
+  </h1>
+  <p class="m-0 mt-2 text-lg leading-relaxed font-semibold whitespace-pre-line tablet:text-xl">{{ store.theme() }}</p>
+</section>
+
+@for (question of store.questions(); track question.number; let i = $index) {
+  <section class="flex flex-col gap-3 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+    <label [for]="'essay-answer-' + i" class="flex flex-col gap-1">
+      <span class="text-sm font-semibold text-primary">
+        {{ 'essay.writing.question' | lang: { number: question.number } }}
+      </span>
+      @if (question.text) {
+        <span class="leading-relaxed whitespace-pre-line">{{ question.text }}</span>
+      }
+    </label>
+
+    <textarea
+      pTextarea
+      class="min-h-60 w-full text-base leading-relaxed"
+      rows="10"
+      spellcheck="false"
+      autocomplete="off"
+      [id]="'essay-answer-' + i"
+      [autoResize]="true"
+      [readOnly]="store.readonly()"
+      [value]="store.answers()[i] ?? ''"
+      [placeholder]="'essay.writing.placeholder' | lang"
+      [attr.aria-describedby]="'essay-count-' + i"
+      (input)="onInput(i, $event)"
+      (beforeinput)="onBeforeInput($event)"
+      (paste)="blockPaste($event)"
+      (drop)="blockPaste($event)"
+    ></textarea>
+
+    <p [id]="'essay-count-' + i" class="m-0 text-xs text-surface-500 tabular-nums">
+      {{ 'essay.writing.count' | lang: { words: stats()[i]?.words ?? 0, chars: stats()[i]?.chars ?? 0 } }}
+    </p>
+  </section>
+}
+
+<section class="flex flex-col gap-3 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+  @if (store.questions().length > 1) {
+    <p class="m-0 text-sm text-surface-600 tabular-nums">
+      {{ 'essay.writing.total' | lang: { words: total().words, chars: total().chars } }}
+    </p>
+  }
+
+  @if (pasteBlocked()) {
+    <p-message severity="warn" size="small" [text]="'essay.writing.paste-blocked' | lang" />
+  }
+
+  @if (emptyError()) {
+    <p-message severity="error" size="small" [text]="'essay.submit.empty' | lang" />
+  }
+
+  <p class="m-0 text-sm text-surface-600">{{ 'essay.submit.hint' | lang: { seconds: autoSubmitSeconds } }}</p>
+
+  <div class="flex">
+    <p-button
+      icon="pi pi-send"
+      styleClass="w-full tablet:w-auto"
+      class="w-full tablet:w-auto"
+      [label]="'essay.submit.button' | lang"
+      [loading]="store.phase() === 'submitting'"
+      [disabled]="store.readonly()"
+      (onClick)="askSubmit()"
+    />
+  </div>
+</section>

@@ -1,0 +1,166 @@
+<div class="mx-auto flex w-full max-w-5xl flex-col gap-4">
+  @switch (store.phase()) {
+    @case ('loading') {
+      <div
+        class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5"
+        aria-busy="true"
+      >
+        <span class="sr-only" role="status">{{ 'quiz.loading' | lang }}</span>
+        <p-skeleton height="2.5rem" />
+        <p-skeleton height="1.5rem" width="70%" />
+        @for (item of [1, 2, 3, 4]; track item) {
+          <p-skeleton height="3rem" />
+        }
+      </div>
+    }
+
+    @case ('error') {
+      <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h1 class="m-0 text-xl font-semibold">{{ 'quiz.error.title' | lang }}</h1>
+        <p-message severity="error" [text]="store.loadError() || ('quiz.error.generic' | lang)" />
+        <div class="flex flex-col gap-2 tablet:flex-row">
+          <p-button icon="pi pi-refresh" [label]="'quiz.error.retry' | lang" (onClick)="reload()" />
+          <p-button
+            icon="pi pi-sign-out"
+            severity="secondary"
+            [outlined]="true"
+            [label]="'quiz.result.logout' | lang"
+            (onClick)="logout()"
+          />
+        </div>
+      </section>
+    }
+
+    @default {
+      <!-- Панель теста: таймер, прогресс, сетка вопросов (на узких экранах), завершение. -->
+      <div
+        class="sticky top-16 z-[5] flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-surface-200 bg-surface-0 px-3 py-2 shadow-sm tablet:px-4"
+      >
+        <app-quiz-timer [seconds]="store.secondsLeft()" (warn)="onWarn($event)" />
+
+        <div class="min-w-0 flex-1">
+          <p class="m-0 truncate text-sm font-medium">
+            {{ 'quiz.progress.answered' | lang: { answered: store.answeredCount(), total: store.total() } }}
+          </p>
+          <div
+            class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-200"
+            role="progressbar"
+            aria-valuemin="0"
+            [attr.aria-valuemax]="store.total()"
+            [attr.aria-valuenow]="store.answeredCount()"
+            [attr.aria-label]="'quiz.progress.label' | lang"
+          >
+            <div class="h-full rounded-full bg-primary transition-[width]" [style.width.%]="progress()"></div>
+          </div>
+        </div>
+
+        <div class="flex w-full gap-2 tablet:w-auto">
+          <button
+            pButton
+            type="button"
+            class="flex-1 desktop-s:hidden tablet:flex-none"
+            severity="secondary"
+            aria-controls="quiz-palette"
+            [outlined]="true"
+            [attr.aria-expanded]="paletteOpen()"
+            (click)="paletteOpen.set(!paletteOpen())"
+          >
+            <i pButtonIcon class="pi" [class.pi-chevron-up]="paletteOpen()" [class.pi-th-large]="!paletteOpen()"></i>
+            <span pButtonLabel>{{ 'quiz.nav.palette' | lang }}</span>
+          </button>
+          <p-button
+            class="flex-1 tablet:flex-none"
+            styleClass="w-full"
+            icon="pi pi-flag"
+            [severity]="allAnswered() ? 'primary' : 'secondary'"
+            [outlined]="!allAnswered()"
+            [label]="'quiz.finish.action' | lang"
+            [disabled]="store.phase() !== 'running'"
+            (onClick)="askFinish()"
+          />
+        </div>
+      </div>
+
+      @if (store.phase() !== 'running') {
+        <div
+          class="flex items-center gap-3 rounded-xl border border-primary-200 bg-primary-50 p-4 text-primary-800"
+          role="status"
+        >
+          <i class="pi pi-spin pi-spinner" aria-hidden="true"></i>
+          <span>{{ (store.timeUp() ? 'quiz.finish.time-up' : 'quiz.finish.finishing') | lang }}</span>
+        </div>
+      }
+
+      @if (store.finishError() !== null) {
+        <div class="flex flex-col gap-2 tablet:flex-row tablet:items-center">
+          <p-message class="flex-1" severity="error" [text]="store.finishError() || ('quiz.finish.error' | lang)" />
+          <p-button icon="pi pi-refresh" [label]="'quiz.finish.retry' | lang" (onClick)="store.finish()" />
+        </div>
+      }
+
+      @if (rulesOpen()) {
+        <p-message severity="info" [closable]="true" (onClose)="rulesOpen.set(false)">
+          <div class="flex flex-col gap-1">
+            <span class="font-semibold">{{ 'quiz.rules.title' | lang }}</span>
+            <span class="text-sm">{{ 'quiz.rules.text' | lang }}</span>
+          </div>
+        </p-message>
+      }
+
+      <div class="grid gap-4 desktop-s:grid-cols-[minmax(0,1fr)_18rem] desktop-s:items-start">
+        <aside
+          id="quiz-palette"
+          class="rounded-xl border border-surface-200 bg-surface-0 p-4 desktop-s:sticky desktop-s:top-36 desktop-s:order-last desktop-s:block"
+          [class.hidden]="!paletteOpen()"
+        >
+          <h2 class="m-0 mb-3 text-sm font-semibold">{{ 'quiz.nav.palette-title' | lang }}</h2>
+          <app-quiz-palette [items]="store.palette()" (go)="go($event)" />
+        </aside>
+
+        <div class="flex min-w-0 flex-col gap-4">
+          @if (store.question(); as question) {
+            <app-quiz-question
+              [question]="question"
+              [total]="store.total()"
+              [selection]="store.selection()"
+              [saving]="store.currentSaving()"
+              [error]="store.currentError()"
+              [locked]="locked()"
+              (optionToggle)="store.select($event)"
+              (save)="store.save()"
+            />
+          }
+
+          @if (allAnswered() && store.phase() === 'running') {
+            <p-message severity="success" icon="pi pi-check-circle" [text]="'quiz.question.all-answered' | lang" />
+          }
+
+          <nav
+            class="grid grid-cols-2 gap-2 tablet:flex tablet:justify-between"
+            [attr.aria-label]="'quiz.nav.pager' | lang"
+          >
+            <p-button
+              styleClass="w-full tablet:w-auto"
+              icon="pi pi-arrow-left"
+              severity="secondary"
+              [outlined]="true"
+              [label]="'quiz.nav.prev' | lang"
+              [disabled]="store.prevNumber() === null"
+              (onClick)="go(store.prevNumber())"
+            />
+            <p-button
+              styleClass="w-full tablet:w-auto"
+              icon="pi pi-arrow-right"
+              iconPos="right"
+              severity="secondary"
+              [outlined]="true"
+              [label]="'quiz.nav.next' | lang"
+              [disabled]="store.nextNumber() === null"
+              (onClick)="go(store.nextNumber())"
+            />
+          </nav>
+        </div>
+      </div>
+    }
+  }
+</div>
