@@ -1,0 +1,155 @@
+<div class="flex max-w-5xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    [routerLink]="baseUrl"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'staff-judges.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="12rem" borderRadius="0.75rem" />
+  } @else if (notFound() || !confirmation()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-file-excel text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.not-found' | lang }}</p>
+      <a pButton [routerLink]="baseUrl">
+        <i pButtonIcon class="pi pi-list"></i>
+        <span pButtonLabel>{{ 'staff-judges.back' | lang }}</span>
+      </a>
+    </section>
+  } @else {
+    @let item = confirmation()!;
+    @let can = actions();
+
+    <header class="flex flex-col gap-3 desktop-s:flex-row desktop-s:items-start">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <app-status-tag kind="judgeConfirmation" [value]="item.status" />
+        <h1 class="m-0 text-2xl font-semibold break-words">{{ judgeName() || ('staff-judges.judge' | lang) }}</h1>
+        <span class="text-sm text-surface-500">{{
+          'judge-confirmation.state.number' | lang: { id: item.id ?? '' }
+        }}</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        @if (can.review) {
+          <p-button
+            icon="pi pi-eye"
+            [label]="'staff-judges.confirmation.review' | lang"
+            [loading]="busy()"
+            (onClick)="review()"
+          />
+        }
+        @if (can.decide) {
+          <p-button
+            icon="pi pi-verified"
+            severity="success"
+            [label]="'staff-judges.confirmation.approve' | lang"
+            [loading]="busy()"
+            (onClick)="approve()"
+          />
+          <p-button
+            icon="pi pi-times"
+            severity="danger"
+            [outlined]="true"
+            [label]="'staff-judges.confirmation.reject' | lang"
+            [disabled]="busy()"
+            (onClick)="rejecting.set(true)"
+          />
+        }
+        @if (item.userId; as userId) {
+          <a pButton severity="secondary" [outlined]="true" [routerLink]="['/administrative/candidates', userId]">
+            <i pButtonIcon class="pi pi-id-card"></i>
+            <span pButtonLabel>{{ 'staff-applications.detail.to-candidate' | lang }}</span>
+          </a>
+        }
+      </div>
+    </header>
+
+    @if (item.status === 'REJECTED' && item.rejectReason) {
+      <p-message severity="error" icon="pi pi-times-circle" [text]="item.rejectReason" />
+    }
+    @if (item.status === 'APPROVED') {
+      <p-message severity="success" icon="pi pi-verified" [text]="'staff-judges.confirmation.approved-hint' | lang" />
+    }
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 text-sm tablet:grid-cols-2">
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'judge-confirmation.form.court' | lang }}</dt>
+          <dd class="m-0 font-medium break-words">{{ item.courtName || '—' }}</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'judge-confirmation.form.experience' | lang }}</dt>
+          <dd class="m-0">{{ item.workExperienceFrom | localDate }} — {{ item.workExperienceTo | localDate }}</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'judge-confirmation.state.submitted' | lang }}</dt>
+          <dd class="m-0">{{ item.submittedAt | serverDateTime }}</dd>
+        </div>
+        @if (item.decidedAt) {
+          <div class="flex flex-col">
+            <dt class="text-surface-500">{{ 'judge-confirmation.state.decided' | lang }}</dt>
+            <dd class="m-0">{{ item.decidedAt | serverDateTime }}</dd>
+          </div>
+        }
+        <div class="flex flex-col tablet:col-span-2">
+          <dt class="text-surface-500">{{ 'judge-confirmation.form.documents' | lang }}</dt>
+          <dd class="m-0 mt-1 flex flex-col gap-1.5">
+            @for (file of files; track file.key) {
+              <div class="flex flex-wrap items-center gap-x-2">
+                <span class="text-surface-700">{{ file.label | lang }}:</span>
+                @if (item[file.key]; as fileId) {
+                  <app-file-link [fileId]="fileId" />
+                } @else {
+                  <span>—</span>
+                }
+              </div>
+            }
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <p-dialog
+      styleClass="w-full max-w-lg mx-4"
+      [modal]="true"
+      [header]="'staff-judges.confirmation.reject-title' | lang"
+      [visible]="rejecting()"
+      (visibleChange)="rejecting.set($event)"
+    >
+      <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium" for="confirmation-reason">
+            {{ 'staff-judges.confirmation.reason' | lang }} <span class="text-red-600" aria-hidden="true">*</span>
+          </label>
+          <textarea
+            pTextarea
+            id="confirmation-reason"
+            class="w-full"
+            rows="5"
+            [autoResize]="true"
+            [maxlength]="4000"
+            [ngModel]="reason()"
+            (ngModelChange)="reason.set($event)"
+          ></textarea>
+        </div>
+        <div class="flex flex-wrap justify-end gap-2">
+          <p-button
+            severity="secondary"
+            [text]="true"
+            [label]="'shell.actions.cancel' | lang"
+            (onClick)="rejecting.set(false)"
+          />
+          <p-button
+            icon="pi pi-times"
+            severity="danger"
+            [label]="'staff-judges.confirmation.reject' | lang"
+            [disabled]="!reason().trim()"
+            (onClick)="reject()"
+          />
+        </div>
+      </div>
+    </p-dialog>
+  }
+</div>

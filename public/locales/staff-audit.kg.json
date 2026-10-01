@@ -1,0 +1,78 @@
+{
+  "title": "Аудит журналы",
+  "subtitle": "Системанын бардык сервистериндеги колдонуучулардын аракеттери",
+  "empty": "Жазуулар жок",
+  "details": "Журнал жазуусу",
+  "filter": {
+    "username": "Логин",
+    "event": "Окуя коду, мисалы APPLICATION_SUBMIT",
+    "entity": "Объект",
+    "action": "Аракет",
+    "result": "Жыйынтык",
+    "reset": "Тазалоо"
+  },
+  "columns": {
+    "occurred-at": "Убактысы",
+    "user": "Колдонуучу",
+    "event": "Окуя",
+    "entity": "Объект",
+    "action": "Аракет",
+    "request": "Суроо-талап",
+    "result": "Жыйынтык"
+  },
+  "fields": {
+    "route": "Маршрут",
+    "service": "Сервис жана узактыгы",
+    "client": "Дарек жана клиент",
+    "trace": "Трассировка"
+  },
+  "result": {
+    "success": "Ийгиликтүү",
+    "failure": "Ката"
+  },
+  "action": {
+    "LOGIN": "Кирүү",
+    "LOGOUT": "Чыгуу",
+    "REGISTRATION": "Каттоо",
+    "VIEW": "Көрүү",
+    "SAVE": "Түзүү",
+    "UPDATE": "Өзгөртүү",
+    "DELETE": "Өчүрүү",
+    "EXPORT": "Экспорт",
+    "IMPORT": "Импорт",
+    "PRINT": "Басып чыгаруу",
+    "PROCESS": "Иштетүү",
+    "CONFIGURE": "Жөндөө"
+  },
+  "entity": {
+    "AUTH": "Аутентификация",
+    "USER": "Колдонуучу",
+    "PROFILE": "Жеке иш",
+    "PROFILE_SECTION": "Жеке иштин бөлүмү",
+    "ADDITIONAL_INFO": "Кошумча маалыматтар",
+    "APPLICATION": "Арыз",
+    "CONTEST": "Конкурс",
+    "QUESTION_BANK": "Суроолор банкы",
+    "TEST": "Тест",
+    "ESSAY": "Эссе",
+    "MEETING": "Отурум",
+    "VOTE": "Добуш берүү",
+    "INTERVIEW": "Маектешүү",
+    "DOCUMENT_ASSESSMENT": "Документтерди баалоо",
+    "COMPLAINT": "Даттануу",
+    "DECISION": "Чечим",
+    "DOCUMENT": "Документ",
+    "FILE": "Файл",
+    "SIGNATURE": "Электрондук кол тамга",
+    "JUDGE_CONFIRMATION": "Судьянын статусун ырастоо",
+    "JUDGE_APPLICATION": "Судьянын арызы",
+    "VACANCY": "Бош орун",
+    "VACANCY_APPLICATION": "Бош орунга жооп",
+    "RESERVE": "Резерв",
+    "NOTIFICATION": "Билдирүү",
+    "DIRECTORY": "Маалымдама",
+    "HOLIDAY": "Майрам күнү",
+    "SETTINGS": "Жөндөөлөр",
+    "REFERENCE_DOCUMENT": "Маалымдама документ"
+  }
+}

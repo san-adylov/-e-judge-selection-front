@@ -31,15 +31,14 @@ src/
     administrative/    # было flows/admin + areas/{chairman,board-member,secretary}
     testing/           # было flows/test
     errors/            # /forbidden, 404
-    screen.ts          # экран карты маршрутов: доступ + список API (заглушка до переноса)
-  features/            # application-wizard, oep-signing, notifications
+  features/            # application-wizard, oep-signing, notifications, candidate-dossier, contest-info, quiz
   domain/
     api/               # *.schema.ts (типы) + сервис на каждый контроллер v2
     stores/            # сигнальные сторы: уведомления, справочники
   shared/
     api/               # interceptors, CSRF, ошибки, SSE
     auth/              # сессия, группы доступа, guards, *appAccess
-    ui/                # shell-layout, таблица, заглушка экрана, тосты
+    ui/                # shell-layout, таблица, поле формы, status-tag, тосты
     lib/               # даты, валидаторы, языки, safeHtml, скачивание
     config/            # environment: API '/v1', AUTH_API '/v1/auth'
 public/locales/        # словари ru/kg: shell, profile + 11 неймспейсов v1
@@ -97,10 +96,29 @@ e2e/                   # Playwright
 | Подтверждение статуса судьи                                                    | `/cabinet/judge-confirmation`         | `flows/cabinet/pages/judge-confirmation`                             |
 | Заявки действующего судьи (ACTIVE_JUDGE)                                       | `/cabinet/judge-applications`, `/:id` | `flows/cabinet/pages/judge-applications`                             |
 
-Экраны `/administrative` и `/testing` подключены через `screen()` в `*.routes.ts`: доступ уже как в v2, вместо
-контента — заглушка со списком маршрутов API. Перенос экрана = замена `loadComponent` на страницу.
+Этапы кандидата (`/testing`): вход по коду, тест (`quiz/:testId`, результат), эссе — `flows/testing/pages`,
+`features/quiz`, `features/stage-timer`.
 
-Ещё не сделано: TinyMCE и Chart.js (подключить вместе с экранами, где они нужны), e2e-сценарии на стенде
+Административная часть (`/administrative`) перенесена, один экран на всех сотрудников (различия — `*appAccess`
+и правила `*-rules.ts` по машинам состояний бэкенда):
+
+| Экран                                                                | Маршрут                                               | Где                                                                   |
+| -------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------- |
+| Конкурсы: список, создание, карточка, план этапов, публикация        | `/administrative/contests`, `/:id`, `/:id/edit`       | `flows/administrative/pages/contests`                                 |
+| Заявки: список по конкурсу и «мои доклады», карточка, действия       | `/administrative/applications`, `/:id`                | `flows/administrative/pages/applications`                             |
+| Оценка документов докладчиком                                        | `/administrative/document-assessment`                 | `flows/administrative/pages/assessment`                               |
+| Кандидат: личное дело и представление                                | `/administrative/candidates/:userId`                  | `flows/administrative/pages/candidates`, `features/candidate-dossier` |
+| Проверка эссе, собеседования (опрос, разблокировка председателем)    | `/administrative/essay-review`, `/interviews`         | `flows/administrative/pages/{essay-review,interviews}`                |
+| Заседания: назначение, перенос, вход, голосование, решения, ОЭП, SSE | `/administrative/meetings`, `/:id`, `/decisions`      | `flows/administrative/pages/meetings`                                 |
+| Результаты и резерв                                                  | `/administrative/results/:contestId`, `/reserve`      | `flows/administrative/pages/{results,reserve}`                        |
+| Вакансии, жалобы, судьи (заявки и подтверждения)                     | `/administrative/vacancies`, `/complaints`, `/judges` | `flows/administrative/pages/{vacancies,complaints,judges}`            |
+| Тесты: банк вопросов, импорт, пройденные тесты, коды этапов          | `/administrative/tests`                               | `flows/administrative/pages/tests`                                    |
+| Темы эссе                                                            | `/administrative/essay-topics`                        | `flows/administrative/pages/essay-topics`                             |
+| Справочники, праздники, документы, веса, окно доступа, анкета        | `/administrative/directories`                         | `flows/administrative/pages/directories`                              |
+| Пользователи: поиск, регистрация, роли, статус                       | `/administrative/users`                               | `flows/administrative/pages/users`                                    |
+| Журнал аудита                                                        | `/administrative/audit`                               | `flows/administrative/pages/audit`                                    |
+
+Ещё не сделано: Chart.js на дашборде (метрики показаны карточками), e2e-сценарии на стенде
 (`e2e/auth.spec.ts`, `test.fixme`).
 
 ### Что попросить у бэкенда

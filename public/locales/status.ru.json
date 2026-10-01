@@ -120,5 +120,26 @@
     "JUDGE_INTERVIEW": "Собеседование с судьёй",
     "CREATE_VACANCY": "Объявление вакансии",
     "CANDIDATE_APPROVAL": "Утверждение кандидата"
+  },
+  "decision": {
+    "PENDING": "Ожидает формирования",
+    "GENERATED": "Сформировано",
+    "CONFIRMED": "Подтверждено",
+    "SIGNED": "Подписано"
+  },
+  "role": {
+    "SUPER_ADMIN": "Главный администратор",
+    "ADMIN": "Администратор",
+    "CHAIRMAN": "Председатель",
+    "VICE_CHAIRMAN": "Заместитель председателя",
+    "BOARD_MEMBER": "Член совета",
+    "SECRETARY": "Секретарь",
+    "ACTIVE_JUDGE": "Действующий судья",
+    "CANDIDATE": "Кандидат"
+  },
+  "userStatus": {
+    "ACTIVE": "Активен",
+    "INACTIVE": "Заблокирован",
+    "DELETED": "Удалён"
   }
 }

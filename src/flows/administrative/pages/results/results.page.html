@@ -1,0 +1,109 @@
+<div class="flex max-w-6xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    [routerLink]="id() ? ['/administrative/contests', id()] : '/administrative/contests'"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'staff-results.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="18rem" borderRadius="0.75rem" />
+  } @else if (failed()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-exclamation-circle text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.load-error' | lang }}</p>
+      <p-button icon="pi pi-refresh" [label]="'shell.actions.retry' | lang" (onClick)="retry()" />
+    </section>
+  } @else {
+    @let data = rating()!;
+
+    <header class="flex flex-col gap-3 desktop-s:flex-row desktop-s:items-start">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          @if (contest(); as item) {
+            <app-status-tag kind="contestType" [value]="item.type" />
+            <app-status-tag kind="contest" [value]="item.status" />
+          }
+          @if (data.materialized) {
+            <span class="text-sm text-surface-500">{{ 'staff-results.materialized' | lang }}</span>
+          }
+        </div>
+        <h1 class="m-0 text-2xl font-semibold break-words">{{ data.contestName || contest()?.name || '—' }}</h1>
+        @if (data.completedAt) {
+          <span class="text-sm text-surface-500">
+            {{ 'staff-results.completed-at' | lang }} {{ data.completedAt | serverDateTime }}
+          </span>
+        }
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="inline-flex items-center gap-2 text-sm">
+          <p-toggleswitch inputId="active-only" [ngModel]="activeOnly()" (ngModelChange)="setActiveOnly($event)" />
+          <label for="active-only">{{ 'staff-results.active-only' | lang }}</label>
+        </div>
+        <p-button
+          icon="pi pi-file-pdf"
+          severity="secondary"
+          [outlined]="true"
+          [label]="'staff-results.reserve-list.action' | lang"
+          [loading]="generating()"
+          (onClick)="reserveList()"
+        />
+      </div>
+    </header>
+
+    <p-message
+      severity="info"
+      icon="pi pi-info-circle"
+      [text]="
+        'staff-results.summary'
+          | lang: { total: entries().length, passed: passedCount(), passing: format(weights().passing) }
+      "
+    />
+
+    <div class="overflow-x-auto rounded-xl border border-surface-200 bg-surface-0">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="border-b border-surface-200 text-left text-xs tracking-wide text-surface-500 uppercase">
+            <th class="px-3 py-2 text-right">#</th>
+            <th class="px-3 py-2">{{ 'staff-results.columns.candidate' | lang }}</th>
+            @for (part of ['documents', 'test', 'essay', 'interview']; track part) {
+              <th class="px-3 py-2 text-right">{{ 'results.part.' + part | lang }}</th>
+            }
+            <th class="px-3 py-2 text-right">{{ 'results.breakdown.total' | lang }}</th>
+            <th class="px-3 py-2">{{ 'staff-results.columns.outcome' | lang }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of entries(); track entry.applicationId) {
+            <tr class="border-b border-surface-100 last:border-b-0 hover:bg-surface-50">
+              <td class="px-3 py-2 text-right tabular-nums text-surface-500">{{ entry.rank ?? '—' }}</td>
+              <td class="px-3 py-2">
+                <a
+                  class="font-medium text-primary no-underline hover:underline"
+                  [routerLink]="['/administrative/applications', entry.applicationId]"
+                >
+                  {{ entry.candidateFullName || '#' + entry.applicationId }}
+                </a>
+                @if (entry.registrationNumber) {
+                  <span class="block text-xs text-surface-500">№ {{ entry.registrationNumber }}</span>
+                }
+              </td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ format(entry.documentScore) }}</td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ format(entry.testScore) }}</td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ format(entry.essayScore) }}</td>
+              <td class="px-3 py-2 text-right tabular-nums">{{ format(entry.interviewScore) }}</td>
+              <td class="px-3 py-2 text-right font-semibold tabular-nums">{{ format(entry.totalScore) }}</td>
+              <td class="px-3 py-2"><app-rating-outcome-tag [entry]="entry" /></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="px-3 py-8 text-center text-surface-500" colspan="8">{{ 'staff-results.empty' | lang }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,170 @@
+<div class="flex max-w-6xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    [routerLink]="baseUrl"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'staff-meetings.detail.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="8rem" borderRadius="0.75rem" />
+    <p-skeleton height="14rem" borderRadius="0.75rem" />
+  } @else if (notFound() || !meeting()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-calendar-times text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.not-found' | lang }}</p>
+      <a pButton [routerLink]="baseUrl">
+        <i pButtonIcon class="pi pi-list"></i>
+        <span pButtonLabel>{{ 'staff-meetings.detail.back' | lang }}</span>
+      </a>
+    </section>
+  } @else {
+    @let item = meeting()!;
+    @let can = actions();
+
+    <header class="flex flex-col gap-3 desktop-s:flex-row desktop-s:items-start">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <app-status-tag kind="meetingType" [value]="item.type" />
+          <app-status-tag kind="meeting" [value]="item.status" />
+          @if (item.forceClosed) {
+            <span class="text-sm text-surface-500">{{ 'staff-meetings.detail.force-closed' | lang }}</span>
+          }
+        </div>
+        <h1 class="m-0 text-2xl font-semibold break-words">
+          {{ item.title || ('staff-meetings.detail.untitled' | lang) }}
+        </h1>
+        <span class="text-sm text-surface-500">{{ item.startDateTime | serverDateTime }}</span>
+      </div>
+
+      @if (can) {
+        <div class="flex flex-wrap gap-2">
+          @if (can.join) {
+            <p-button
+              icon="pi pi-sign-in"
+              [label]="'staff-meetings.actions.join' | lang"
+              [loading]="busy()"
+              (onClick)="join()"
+            />
+          }
+          @if (can.reschedule) {
+            <p-button
+              icon="pi pi-calendar"
+              severity="secondary"
+              [outlined]="true"
+              [label]="'staff-meetings.actions.reschedule' | lang"
+              [disabled]="busy()"
+              (onClick)="rescheduling.set(true)"
+            />
+          }
+          @if (can.forceClose) {
+            <p-button
+              icon="pi pi-lock"
+              severity="danger"
+              [outlined]="true"
+              [label]="'staff-meetings.actions.force-close' | lang"
+              [disabled]="busy()"
+              (onClick)="forceClose()"
+            />
+          }
+        </div>
+      }
+    </header>
+
+    @if (item.status === 'APPOINTED') {
+      <p-message
+        severity="info"
+        icon="pi pi-users"
+        [text]="'staff-meetings.detail.waiting-quorum' | lang: { count: item.participantCount ?? 0 }"
+      />
+    }
+
+    <div class="grid grid-cols-1 gap-4 desktop-s:grid-cols-[minmax(0,1fr)_20rem] desktop-s:items-start">
+      <div class="flex min-w-0 flex-col gap-4">
+        @if (item.contestId) {
+          <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="text-sm text-surface-500">{{ 'staff-meetings.detail.contest' | lang }}</span>
+              <a
+                class="min-w-0 flex-1 font-medium text-primary no-underline hover:underline"
+                [routerLink]="['/administrative/contests', item.contestId]"
+              >
+                {{ item.title || '#' + item.contestId }}
+              </a>
+              @if (item.type === 'INTERVIEW') {
+                <a
+                  pButton
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  routerLink="/administrative/interviews"
+                  [queryParams]="{ meetingId: item.id }"
+                >
+                  <i pButtonIcon class="pi pi-users"></i>
+                  <span pButtonLabel>{{ 'shell.nav.interviews' | lang }}</span>
+                </a>
+              }
+              @if (item.type === 'CLOSE_COMPETITION') {
+                <a
+                  pButton
+                  size="small"
+                  severity="secondary"
+                  [outlined]="true"
+                  [routerLink]="['/administrative/results', item.contestId]"
+                >
+                  <i pButtonIcon class="pi pi-chart-bar"></i>
+                  <span pButtonLabel>{{ 'shell.nav.results' | lang }}</span>
+                </a>
+              }
+            </div>
+          </section>
+        }
+
+        @if (showSchedule()) {
+          <app-contest-schedule [contest]="contest()" [plan]="contest()?.steps ?? []" />
+        }
+
+        <h2 class="m-0 text-base font-semibold">{{ 'staff-meetings.subjects.title' | lang }}</h2>
+        <app-meeting-subjects [meeting]="item" [canVote]="can?.vote ?? false" [version]="version()" />
+
+        @if (item.type === 'OPEN_COMPETITION') {
+          <ng-container *appAccess="'SECRETARY'">
+            <app-opening-decision [meeting]="item" [version]="version()" />
+          </ng-container>
+        }
+
+        <app-decisions-panel [meetingId]="item.id!" [version]="version()" />
+      </div>
+
+      <aside class="rounded-xl border border-surface-200 bg-surface-0 p-4">
+        <h2 class="m-0 mb-3 text-base font-semibold">
+          {{ 'staff-meetings.detail.participants' | lang: { count: item.participants?.length ?? 0 } }}
+        </h2>
+        <ul class="m-0 flex list-none flex-col gap-2 p-0 text-sm">
+          @for (participant of item.participants ?? []; track participant.userId) {
+            <li class="flex items-start gap-2">
+              <i
+                class="pi mt-0.5"
+                aria-hidden="true"
+                [class.pi-star-fill]="participant.chairman"
+                [class.text-amber-500]="participant.chairman"
+                [class.pi-user]="!participant.chairman"
+                [class.text-surface-400]="!participant.chairman"
+              ></i>
+              <span class="flex min-w-0 flex-1 flex-col">
+                <span class="font-medium break-words">{{ participant.fullName || '—' }}</span>
+                <span class="text-xs text-surface-500">{{ participant.joinedAt | serverDateTime }}</span>
+              </span>
+            </li>
+          } @empty {
+            <li class="text-surface-500">{{ 'staff-meetings.detail.no-participants' | lang }}</li>
+          }
+        </ul>
+      </aside>
+    </div>
+
+    <app-reschedule-dialog [meeting]="item" [(visible)]="rescheduling" (rescheduled)="onRescheduled($event)" />
+  }
+</div>

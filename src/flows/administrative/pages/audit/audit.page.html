@@ -1,0 +1,164 @@
+<app-page-header title="staff-audit.title" subtitle="staff-audit.subtitle" />
+
+<form class="mb-4 grid grid-cols-1 gap-3 tablet:grid-cols-2 desktop:grid-cols-4" (ngSubmit)="apply()">
+  <input
+    pInputText
+    name="username"
+    [placeholder]="'staff-audit.filter.username' | lang"
+    [ngModel]="username()"
+    (ngModelChange)="username.set($event)"
+  />
+  <input
+    pInputText
+    name="eventType"
+    class="font-mono"
+    [placeholder]="'staff-audit.filter.event' | lang"
+    [ngModel]="eventType()"
+    (ngModelChange)="eventType.set($event)"
+  />
+  <p-select
+    name="entityType"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [filter]="true"
+    [showClear]="true"
+    [options]="entityOptions()"
+    [placeholder]="'staff-audit.filter.entity' | lang"
+    [ariaLabel]="'staff-audit.filter.entity' | lang"
+    [ngModel]="entityType()"
+    (ngModelChange)="entityType.set($event)"
+  />
+  <p-select
+    name="actionType"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [showClear]="true"
+    [options]="actionOptions()"
+    [placeholder]="'staff-audit.filter.action' | lang"
+    [ariaLabel]="'staff-audit.filter.action' | lang"
+    [ngModel]="actionType()"
+    (ngModelChange)="actionType.set($event)"
+  />
+  <p-datepicker
+    name="from"
+    dateFormat="dd.mm.yy"
+    appendTo="body"
+    styleClass="w-full"
+    [showTime]="true"
+    [showIcon]="true"
+    [showClear]="true"
+    [placeholder]="'shell.form.from' | lang"
+    [ariaLabel]="'shell.form.from' | lang"
+    [ngModel]="from()"
+    (ngModelChange)="from.set($event)"
+  />
+  <p-datepicker
+    name="to"
+    dateFormat="dd.mm.yy"
+    appendTo="body"
+    styleClass="w-full"
+    [showTime]="true"
+    [showIcon]="true"
+    [showClear]="true"
+    [placeholder]="'shell.form.to' | lang"
+    [ariaLabel]="'shell.form.to' | lang"
+    [ngModel]="to()"
+    (ngModelChange)="to.set($event)"
+  />
+  <p-select
+    name="success"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [showClear]="true"
+    [options]="successOptions()"
+    [placeholder]="'staff-audit.filter.result' | lang"
+    [ariaLabel]="'staff-audit.filter.result' | lang"
+    [ngModel]="success()"
+    (ngModelChange)="success.set($event)"
+  />
+  <span class="flex gap-2">
+    <p-button type="submit" icon="pi pi-search" [label]="'shell.form.search' | lang" [loading]="loading()" />
+    <p-button severity="secondary" [outlined]="true" [label]="'staff-audit.filter.reset' | lang" (onClick)="reset()" />
+  </span>
+</form>
+
+<div class="rounded-xl border border-surface-200 bg-surface-0 p-2 tablet:p-4">
+  <app-data-table
+    [rows]="rows()"
+    [columns]="columns()"
+    [loading]="loading()"
+    [total]="total()"
+    [page]="page()"
+    [size]="size()"
+    [sizeOptions]="[20, 50, 100]"
+    [rowHeight]="48"
+    emptyText="staff-audit.empty"
+    (pageChange)="onPage($event)"
+    (rowClick)="open($event)"
+  />
+</div>
+
+<ng-template #requestCell let-row="row">
+  <span class="truncate font-mono text-xs">{{ row.httpMethod }} {{ row.uri }}</span>
+</ng-template>
+<ng-template #resultCell let-row="row">
+  <p-tag
+    [severity]="row.success === false ? 'danger' : 'success'"
+    [value]="(row.success === false ? 'staff-audit.result.failure' : 'staff-audit.result.success') | lang"
+  />
+</ng-template>
+
+<p-dialog
+  styleClass="w-full max-w-2xl mx-4"
+  [modal]="true"
+  [header]="'staff-audit.details' | lang"
+  [visible]="detailsOpen()"
+  (visibleChange)="detailsOpen.set($event)"
+>
+  @if (selected(); as entry) {
+    <dl class="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-sm">
+      <dt class="text-surface-500">{{ 'staff-audit.columns.occurred-at' | lang }}</dt>
+      <dd class="m-0">{{ entry.occurredAt | serverDateTime }}</dd>
+      <dt class="text-surface-500">{{ 'staff-audit.columns.user' | lang }}</dt>
+      <dd class="m-0">
+        {{ entry.username || '—' }}
+        @if (entry.userId) {
+          (#{{ entry.userId }})
+        }
+        · {{ entry.roles?.join(', ') || '—' }}
+      </dd>
+      <dt class="text-surface-500">{{ 'staff-audit.columns.event' | lang }}</dt>
+      <dd class="m-0 font-mono">{{ entry.eventType || '—' }}</dd>
+      <dt class="text-surface-500">{{ 'staff-audit.columns.entity' | lang }}</dt>
+      <dd class="m-0">
+        {{ entry.entityType ? ('staff-audit.entity.' + entry.entityType | lang) : '—' }} ·
+        {{ entry.actionType ? ('staff-audit.action.' + entry.actionType | lang) : '—' }}
+      </dd>
+      <dt class="text-surface-500">{{ 'staff-audit.columns.request' | lang }}</dt>
+      <dd class="m-0 font-mono break-all">{{ entry.httpMethod }} {{ entry.uri }}</dd>
+      @if (entry.routePattern) {
+        <dt class="text-surface-500">{{ 'staff-audit.fields.route' | lang }}</dt>
+        <dd class="m-0 font-mono break-all">{{ entry.routePattern }}</dd>
+      }
+      <dt class="text-surface-500">{{ 'staff-audit.fields.service' | lang }}</dt>
+      <dd class="m-0">{{ entry.serviceName || '—' }} · {{ entry.durationMs ?? '—' }} ms</dd>
+      <dt class="text-surface-500">{{ 'staff-audit.fields.client' | lang }}</dt>
+      <dd class="m-0 break-all">{{ entry.ipAddress || '—' }} · {{ entry.userAgent || '—' }}</dd>
+      <dt class="text-surface-500">{{ 'staff-audit.fields.trace' | lang }}</dt>
+      <dd class="m-0 font-mono break-all">{{ entry.traceId || '—' }}</dd>
+      <dt class="text-surface-500">{{ 'staff-audit.columns.result' | lang }}</dt>
+      <dd class="m-0">
+        <p-tag
+          [severity]="entry.success === false ? 'danger' : 'success'"
+          [value]="(entry.success === false ? 'staff-audit.result.failure' : 'staff-audit.result.success') | lang"
+        />
+        @if (entry.errorMessage) {
+          <span class="mt-1 block text-red-700">{{ entry.errorMessage }}</span>
+        }
+      </dd>
+    </dl>
+  }
+</p-dialog>

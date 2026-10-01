@@ -1,5 +1,5 @@
 import { hasAccess, type Role } from './access-groups';
-import type { Session } from './auth.models';
+import type { Session, UserSummary } from './auth.models';
 
 /**
  * Префиксы URL не меняются с v1: на них завязаны закладки, ссылки в уведомлениях
@@ -39,6 +39,14 @@ export function safeReturnUrl(value: string | null | undefined): string | null {
   return Object.values(SIGN_IN_URLS).some((url) => value.startsWith(url)) ? null : value;
 }
 
+/** Роли пользователя: набор `roles`; если бэкенд прислал только устаревшее `role` — из него. */
+export function rolesOf(user: Pick<UserSummary, 'roles' | 'role'> | null | undefined): Role[] {
+  if (!user) return [];
+  if (Array.isArray(user.roles) && user.roles.length) return user.roles;
+
+  return user.role ? [user.role] : [];
+}
+
 /**
  * Корневой редирект: токен этапа → тестирование; есть `STAFF` → `/administrative`;
  * иначе `/cabinet`. При обеих группах в шапке есть переключатель.
@@ -52,7 +60,7 @@ export function homeUrl(session: Session | null): string {
       : `${AREAS.testing}/essay`;
   }
 
-  const roles: readonly Role[] = session.user.roles;
+  const roles = rolesOf(session.user);
 
   if (hasAccess(roles, 'STAFF')) return AREAS.administrative;
   if (hasAccess(roles, 'CANDIDATE')) return AREAS.cabinet;

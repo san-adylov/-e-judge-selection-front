@@ -3,8 +3,6 @@ import type { Routes } from '@angular/router';
 import { access, guestOnly } from '@shared/auth/guards';
 import { CenteredLayoutComponent } from '@shared/ui/page/centered-layout.component';
 
-import { screen } from '../screen';
-
 /**
  * Административная часть: один маршрут — один экран для всех ролей группы (было `flows/admin` +
  * `areas/{chairman,board-member,secretary}`). Различия ролей — через группы доступа, а не копии страниц.
@@ -69,151 +67,79 @@ export const ADMINISTRATIVE_ROUTES: Routes = [
         canMatch: [access('BOARD')],
         loadComponent: () => import('./pages/interviews/interviews.page'),
       },
-      screen({
-        path: 'meetings',
-        title: 'shell.nav.meetings',
-        access: 'STAFF',
-        actions: 'создание — COUNCIL',
-        api: ['GET /meeting?status', 'POST /meeting'],
-      }),
-      screen({
+      { path: 'meetings', title: 'shell.nav.meetings', loadComponent: () => import('./pages/meetings/meetings.page') },
+      {
         path: 'meetings/:id',
         title: 'shell.nav.meetings',
-        access: 'STAFF',
-        actions: 'голос — BOARD, разблокировка — CHAIRMAN',
-        api: [
-          'GET /meeting/{id}',
-          'POST /meeting/{id}/join',
-          'PUT /meeting/{id}/force-close',
-          'PATCH /meeting/{id}/candidates/{applicationId}/unlock',
-          'POST /vote',
-          'GET /vote/{id}/summary',
-          '/oep/*',
-        ],
-      }),
-      screen({
+        loadComponent: () => import('./pages/meetings/meeting-detail.page'),
+      },
+      {
         path: 'decisions',
         title: 'shell.nav.decisions',
-        access: 'STAFF',
-        actions: 'формирование — SECRETARY, утверждение — CHAIRMAN',
-        api: [
-          'GET /decision/by-meeting/{id}',
-          'POST /decision/{id}/generate',
-          'POST /decision/{id}/confirm',
-          'GET /decision/{id}/download',
-        ],
-      }),
-      screen({
+        loadComponent: () => import('./pages/meetings/decisions.page'),
+      },
+      {
         path: 'results/:contestId',
         title: 'shell.nav.results',
-        access: 'STAFF',
-        api: [
-          'GET /contest-results/{id}/rating',
-          'GET /contest-results/{id}/results',
-          'GET /contest-results/{id}/passed-candidates',
-          'GET /contest-results/{id}/reserve-candidates',
-          'GET /contest-results/{id}/readiness',
-          'POST /contest-results/{id}/reserve-list',
-        ],
-      }),
-      screen({
-        path: 'reserve',
-        title: 'shell.nav.reserve',
-        access: 'STAFF',
-        api: ['GET /candidate/reserve', 'POST /candidate/reserve/{id}/exclude'],
-      }),
-      screen({
+        loadComponent: () => import('./pages/results/results.page'),
+      },
+      { path: 'reserve', title: 'shell.nav.reserve', loadComponent: () => import('./pages/reserve/reserve.page') },
+      {
         path: 'vacancies',
         title: 'shell.nav.vacancies',
-        access: 'STAFF',
-        actions: 'создание и отмена — CHAIRMAN, публикация — SECRETARY',
-        api: ['GET /vacancy', 'POST /vacancy'],
-      }),
-      screen({
+        loadComponent: () => import('./pages/vacancies/vacancies.page'),
+      },
+      {
         path: 'vacancies/:id',
         title: 'shell.nav.vacancies',
-        access: 'STAFF',
-        actions: 'создание и отмена — CHAIRMAN, публикация — SECRETARY',
-        api: [
-          'GET /vacancy/{id}',
-          'POST /vacancy/{id}/publish',
-          'POST /vacancy/{id}/cancel',
-          'POST /vacancy/{id}/meeting',
-          'POST /vacancy/{id}/select-from-reserve',
-          'GET /vacancy-application/by-vacancy/{id}',
-          'POST /vacancy-application/{id}/sunush',
-        ],
-      }),
-      screen({
+        loadComponent: () => import('./pages/vacancies/vacancy-detail.page'),
+      },
+      {
         path: 'complaints',
         title: 'shell.nav.complaints',
-        access: 'STAFF',
-        actions: 'заключение — SECRETARY',
-        api: ['GET /complaints', 'POST /complaints/{id}/conclusion', 'GET|POST /complaint-reviews'],
-      }),
-      screen({
-        path: 'judges',
+        loadComponent: () => import('./pages/complaints/complaints.page'),
+      },
+      { path: 'judges', title: 'shell.nav.judges', loadComponent: () => import('./pages/judges/judges.page') },
+      {
+        path: 'judges/applications/:id',
         title: 'shell.nav.judges',
-        access: 'STAFF',
-        actions: 'регистрация и решения — SECRETARY, оценки — BOARD',
-        api: [
-          'GET /judge-applications',
-          'GET /judge-applications/under-review',
-          'GET /judge-applications/active-for-secretary',
-          'GET /active-judge-confirmations',
-          'POST /active-judge-confirmations/{id}/review|approve|reject',
-        ],
-      }),
+        loadComponent: () => import('./pages/judges/judge-application.page'),
+      },
+      {
+        path: 'judges/confirmations/:id',
+        title: 'shell.nav.judges',
+        loadComponent: () => import('./pages/judges/confirmation.page'),
+      },
       {
         path: 'candidates/:userId',
         title: 'shell.nav.candidate',
         loadComponent: () => import('./pages/candidates/candidate.page'),
       },
-      screen({
-        path: 'tests',
-        title: 'shell.nav.tests',
-        access: 'STAFF',
-        actions: 'импорт — ADMIN, коды — SECRETARY',
-        api: [
-          'GET /questions',
-          'GET /questions/categories',
-          'POST /questions/import',
-          'GET /tests',
-          'POST /tests/codes/issue',
-        ],
-      }),
-      screen({
+      { path: 'tests', title: 'shell.nav.tests', loadComponent: () => import('./pages/tests/tests.page') },
+      {
         path: 'essay-topics',
         title: 'shell.nav.essay-topics',
-        access: 'ADMIN',
-        api: ['GET|POST /essay/topic', 'PUT|DELETE /essay/topic/{id}'],
-      }),
-      screen({
+        canMatch: [access('ADMIN')],
+        loadComponent: () => import('./pages/essay-topics/essay-topics.page'),
+      },
+      {
         path: 'directories',
         title: 'shell.nav.directories',
-        access: 'ADMIN',
-        api: [
-          'GET /directory/{code}',
-          '/holidays',
-          '/reference',
-          '/weights',
-          '/schedule-settings',
-          'GET /additional-info/questions/all',
-        ],
-      }),
-      screen({
+        canMatch: [access('ADMIN')],
+        loadComponent: () => import('./pages/directories/directories.page'),
+      },
+      {
         path: 'users',
         title: 'shell.nav.users',
-        access: 'STAFF',
-        actions: 'изменение — ADMIN',
-        api: ['GET /users', 'GET /users/board-members', 'PATCH /users/{id}/status', 'PUT /users/{id}/roles'],
-      }),
-      screen({
+        canMatch: [access(['ADMIN', 'CHAIRMAN'])],
+        loadComponent: () => import('./pages/users/users.page'),
+      },
+      {
         path: 'audit',
         title: 'shell.nav.audit',
-        access: 'ADMIN',
-        api: ['GET /audit', 'GET /audit/users/{userId}'],
-      }),
+        canMatch: [access('ADMIN')],
+        loadComponent: () => import('./pages/audit/audit.page'),
+      },
       {
         path: 'notifications',
         title: 'shell.notifications.title',

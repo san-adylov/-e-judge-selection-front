@@ -1,0 +1,95 @@
+<p-dialog
+  styleClass="w-full max-w-3xl mx-4"
+  [modal]="true"
+  [header]="(editing() ? 'staff-tests.question.edit-title' : 'staff-tests.question.create-title') | lang"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+>
+  <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()">
+    <app-form-field
+      label="staff-tests.question.text-ru"
+      inputId="q-text-ru"
+      [required]="true"
+      [control]="form.controls.textRu"
+    >
+      <input pInputText id="q-text-ru" class="w-full" formControlName="textRu" />
+    </app-form-field>
+    <app-form-field
+      label="staff-tests.question.text-kg"
+      inputId="q-text-kg"
+      [required]="true"
+      [control]="form.controls.textKg"
+    >
+      <input pInputText id="q-text-kg" class="w-full" formControlName="textKg" />
+    </app-form-field>
+
+    <div class="flex flex-col gap-1">
+      <span class="text-sm font-medium">{{ 'staff-tests.question.choice-type' | lang }}</span>
+      <p-selectbutton
+        optionLabel="label"
+        optionValue="value"
+        [options]="choiceOptions()"
+        [allowEmpty]="false"
+        formControlName="choiceType"
+      />
+    </div>
+
+    <fieldset class="m-0 flex flex-col gap-3 border-0 p-0" formArrayName="options">
+      <legend class="mb-1 p-0 text-sm font-medium">{{ 'staff-tests.question.options' | lang }}</legend>
+      @for (option of options.controls; track option; let i = $index) {
+        <div class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2" [formGroupName]="i">
+          <p-checkbox
+            [binary]="true"
+            [inputId]="'q-correct-' + i"
+            formControlName="correct"
+            [ariaLabel]="'staff-tests.question.correct' | lang"
+          />
+          <input
+            pInputText
+            class="w-full"
+            [placeholder]="'staff-tests.question.option-ru' | lang: { number: i + 1 }"
+            formControlName="textRu"
+          />
+          <input
+            pInputText
+            class="w-full"
+            [placeholder]="'staff-tests.question.option-kg' | lang: { number: i + 1 }"
+            formControlName="textKg"
+          />
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [ariaLabel]="'shell.actions.delete' | lang"
+            [disabled]="options.length <= 2"
+            (onClick)="removeOption(i)"
+          />
+        </div>
+      }
+      <p-button
+        class="self-start"
+        size="small"
+        icon="pi pi-plus"
+        severity="secondary"
+        [outlined]="true"
+        [label]="'staff-tests.question.add-option' | lang"
+        [disabled]="options.length >= maxOptions"
+        (onClick)="addOption()"
+      />
+      <small class="text-surface-500">{{ 'staff-tests.question.options-hint' | lang }}</small>
+      @if (correctError()) {
+        <p-message severity="error" size="small" [text]="'staff-tests.question.correct-error' | lang" />
+      }
+    </fieldset>
+
+    <div class="flex flex-wrap justify-end gap-2">
+      <p-button
+        severity="secondary"
+        [text]="true"
+        [label]="'shell.actions.cancel' | lang"
+        (onClick)="visible.set(false)"
+      />
+      <p-button type="submit" icon="pi pi-save" [label]="'shell.actions.save' | lang" [loading]="saving()" />
+    </div>
+  </form>
+</p-dialog>

@@ -1,0 +1,129 @@
+<div class="mb-4 flex flex-col gap-3 desktop-s:flex-row desktop-s:items-center">
+  <p-select
+    class="w-full desktop-s:w-96"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [filter]="true"
+    [options]="contestOptions()"
+    [placeholder]="'staff-applications.filter.contest' | lang"
+    [ariaLabel]="'staff-applications.filter.contest' | lang"
+    [ngModel]="contestId()"
+    (ngModelChange)="setContest($event)"
+  />
+  <p-selectbutton
+    optionLabel="label"
+    optionValue="value"
+    [options]="exerciseOptions()"
+    [allowEmpty]="false"
+    [ngModel]="exercise()"
+    (ngModelChange)="setExercise($event)"
+  />
+</div>
+
+@if (issued().length) {
+  <section class="mb-4 flex flex-col gap-3 rounded-xl border border-green-300 bg-green-50 p-4">
+    <div class="flex flex-wrap items-center gap-2">
+      <h3 class="m-0 flex-1 text-base font-semibold text-green-900">{{ 'staff-tests.codes.issued-title' | lang }}</h3>
+      <p-button
+        size="small"
+        icon="pi pi-copy"
+        severity="secondary"
+        [outlined]="true"
+        [label]="'staff-tests.codes.copy' | lang"
+        (onClick)="copy()"
+      />
+    </div>
+    <p-message severity="warn" icon="pi pi-exclamation-triangle" [text]="'staff-tests.codes.once' | lang" />
+    <ul class="m-0 flex list-none flex-col gap-1 p-0 font-mono text-sm">
+      @for (code of issued(); track code.applicationId) {
+        <li class="flex flex-wrap items-center gap-3">
+          <span class="min-w-0 flex-1 font-sans">{{ name(candidateOf(code.applicationId)) }}</span>
+          <span class="rounded bg-surface-0 px-2 py-0.5 text-base font-semibold tracking-widest">{{ code.code }}</span>
+          <span class="font-sans text-xs text-surface-500"
+            >{{ 'staff-tests.codes.expires' | lang }} {{ code.expiresAt | serverDateTime }}</span
+          >
+        </li>
+      }
+    </ul>
+  </section>
+}
+
+@if (contestId() === null) {
+  <section class="flex flex-col items-center gap-2 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+    <i class="pi pi-key text-3xl text-surface-400" aria-hidden="true"></i>
+    <p class="m-0 text-surface-600">{{ 'staff-tests.codes.select-contest' | lang }}</p>
+  </section>
+} @else if (loading()) {
+  <p-skeleton height="10rem" borderRadius="0.75rem" />
+} @else {
+  <div class="grid grid-cols-1 gap-4 desktop-s:grid-cols-[minmax(0,1fr)_22rem] desktop-s:items-start">
+    <section class="rounded-xl border border-surface-200 bg-surface-0">
+      <header class="flex items-center gap-3 border-b border-surface-100 px-4 py-3">
+        <p-checkbox inputId="codes-all" [binary]="true" [ngModel]="allSelected()" (ngModelChange)="toggleAll($event)" />
+        <label for="codes-all" class="text-sm font-medium">
+          {{ 'staff-tests.codes.candidates' | lang: { count: applications().length, selected: selected().size } }}
+        </label>
+      </header>
+      @for (item of applications(); track item.id) {
+        <div class="flex items-center gap-3 border-b border-surface-100 px-4 py-2 last:border-b-0">
+          <p-checkbox
+            [inputId]="'codes-' + item.id"
+            [binary]="true"
+            [ngModel]="selected().has(item.id ?? -1)"
+            (ngModelChange)="toggle(item.id, $event)"
+          />
+          <label [for]="'codes-' + item.id" class="min-w-0 flex-1 text-sm">
+            <span class="block font-medium">{{ name(item.candidateId) }}</span>
+            <span class="block text-xs text-surface-500">
+              @if (item.registrationNumber) {
+                № {{ item.registrationNumber }} ·
+              }
+              {{ 'applications.fields.preferred-language' | lang }}:
+              {{ item.preferredLanguage ? ('applications.language.' + item.preferredLanguage | lang) : '—' }}
+            </span>
+          </label>
+        </div>
+      } @empty {
+        <p class="m-0 p-6 text-center text-sm text-surface-500">{{ 'staff-tests.codes.empty' | lang }}</p>
+      }
+    </section>
+
+    <aside class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4">
+      <h3 class="m-0 text-base font-semibold">{{ 'staff-tests.codes.invitation' | lang }}</h3>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium" for="codes-date">{{ 'staff-tests.codes.date' | lang }}</label>
+        <p-datepicker
+          inputId="codes-date"
+          dateFormat="dd.mm.yy"
+          appendTo="body"
+          styleClass="w-full"
+          [showTime]="true"
+          [showIcon]="true"
+          [minDate]="now"
+          [ngModel]="dateTime()"
+          (ngModelChange)="dateTime.set($event)"
+        />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-medium" for="codes-address">{{ 'staff-tests.codes.address' | lang }}</label>
+        <input
+          pInputText
+          id="codes-address"
+          class="w-full"
+          [maxlength]="500"
+          [ngModel]="address()"
+          (ngModelChange)="address.set($event)"
+        />
+      </div>
+      <p class="m-0 text-xs text-surface-500">{{ 'staff-tests.codes.hint' | lang }}</p>
+      <p-button
+        icon="pi pi-key"
+        [label]="'staff-tests.codes.issue' | lang: { count: selected().size }"
+        [loading]="issuing()"
+        [disabled]="!selected().size"
+        (onClick)="issue()"
+      />
+    </aside>
+  </div>
+}

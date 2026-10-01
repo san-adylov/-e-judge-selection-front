@@ -22,6 +22,14 @@ describe('areas', () => {
     expect(homeUrl(session(['ACTIVE_JUDGE']))).toBe('/cabinet');
   });
 
+  it('falls back to the scalar role when the roles set is missing', () => {
+    const legacy = session([]);
+
+    legacy.user.role = 'SECRETARY';
+    expect(homeUrl(legacy)).toBe('/administrative');
+    expect(homeUrl(session([]))).toBe('/forbidden');
+  });
+
   it('routes a stage token to its exercise', () => {
     expect(homeUrl(session(['CANDIDATE'], { exerciseId: 42, exerciseType: 'TEST' }))).toBe('/testing/quiz/42');
     expect(homeUrl(session(['CANDIDATE'], { exerciseId: 7, exerciseType: 'ESSAY' }))).toBe('/testing/essay');

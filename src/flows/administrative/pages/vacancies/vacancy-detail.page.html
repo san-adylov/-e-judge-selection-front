@@ -1,0 +1,251 @@
+<div class="flex max-w-5xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    [routerLink]="baseUrl"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'staff-vacancies.detail.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="10rem" borderRadius="0.75rem" />
+    <p-skeleton height="14rem" borderRadius="0.75rem" />
+  } @else if (notFound() || !vacancy()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-briefcase text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.not-found' | lang }}</p>
+      <a pButton [routerLink]="baseUrl">
+        <i pButtonIcon class="pi pi-list"></i>
+        <span pButtonLabel>{{ 'staff-vacancies.detail.back' | lang }}</span>
+      </a>
+    </section>
+  } @else {
+    @let item = vacancy()!;
+    @let can = actions();
+
+    <header class="flex flex-col gap-3 desktop-s:flex-row desktop-s:items-start">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <app-status-tag kind="vacancy" [value]="item.status" />
+        <h1 class="m-0 text-2xl font-semibold break-words">{{ item.name || '#' + item.id }}</h1>
+        <a
+          class="text-sm text-primary no-underline hover:underline"
+          [routerLink]="['/administrative/contests', item.contestId]"
+        >
+          {{ 'staff-vacancies.detail.contest' | lang }} #{{ item.contestId }}
+        </a>
+      </div>
+      @if (can) {
+        <div class="flex flex-wrap gap-2">
+          @if (can.edit) {
+            <p-button
+              icon="pi pi-pencil"
+              severity="secondary"
+              [outlined]="true"
+              [label]="'shell.actions.edit' | lang"
+              (onClick)="editing.set(true)"
+            />
+          }
+          @if (can.publish) {
+            <p-button
+              icon="pi pi-megaphone"
+              [label]="'staff-vacancies.actions.publish' | lang"
+              [loading]="busy() === 'publish'"
+              (onClick)="publish()"
+            />
+          }
+          @if (can.selectFromReserve) {
+            <p-button
+              icon="pi pi-users"
+              severity="secondary"
+              [outlined]="true"
+              [label]="'staff-vacancies.actions.select-from-reserve' | lang"
+              [loading]="busy() === 'select'"
+              (onClick)="selectFromReserve()"
+            />
+          }
+          @if (can.scheduleMeeting) {
+            <p-button
+              icon="pi pi-calendar-plus"
+              [label]="'staff-vacancies.actions.schedule-meeting' | lang"
+              (onClick)="scheduling.set(true)"
+            />
+          }
+          @if (can.cancel) {
+            <p-button
+              icon="pi pi-times"
+              severity="danger"
+              [outlined]="true"
+              [label]="'staff-vacancies.actions.cancel' | lang"
+              [loading]="busy() === 'cancel'"
+              (onClick)="cancel()"
+            />
+          }
+        </div>
+      }
+    </header>
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <dl class="m-0 grid grid-cols-1 gap-3 text-sm tablet:grid-cols-2 desktop-s:grid-cols-4">
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-vacancies.fields.places' | lang }}</dt>
+          <dd class="m-0 font-medium">
+            {{ 'staff-vacancies.fields.places-value' | lang: { free: free(), total: item.quantity ?? 0 } }}
+          </dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-vacancies.fields.period' | lang }}</dt>
+          <dd class="m-0 font-medium">{{ item.startDate | localDate }} — {{ item.endDate | localDate }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-vacancies.fields.created-at' | lang }}</dt>
+          <dd class="m-0 font-medium">{{ item.createdAt | serverDateTime }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-vacancies.fields.meetings' | lang }}</dt>
+          <dd class="m-0 flex flex-wrap gap-2">
+            @for (meetingId of item.meetingIds ?? []; track meetingId) {
+              <a
+                class="text-primary no-underline hover:underline"
+                [routerLink]="['/administrative/meetings', meetingId]"
+                >#{{ meetingId }}</a
+              >
+            } @empty {
+              <span class="text-surface-400">—</span>
+            }
+          </dd>
+        </div>
+      </dl>
+      @if (item.description) {
+        <p class="m-0 mt-4 text-sm leading-relaxed whitespace-pre-line">{{ item.description }}</p>
+      }
+      @if (item.fileIds?.length) {
+        <div class="mt-4 flex flex-wrap gap-3">
+          @for (fileId of item.fileIds; track fileId) {
+            <app-file-link [fileId]="fileId" />
+          }
+        </div>
+      }
+    </section>
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <h2 class="m-0 mb-3 text-base font-semibold">
+        {{ 'staff-vacancies.applications.title' | lang: { count: applications().length } }}
+      </h2>
+      <ul class="m-0 flex list-none flex-col gap-2 p-0">
+        @for (application of applications(); track application.id) {
+          @let appCan = applicationActions(application);
+          <li class="flex flex-wrap items-center gap-3 rounded-lg border border-surface-200 p-3">
+            <div class="flex min-w-0 flex-1 flex-col gap-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <a
+                  class="font-medium text-primary no-underline hover:underline"
+                  [routerLink]="['/administrative/applications', application.contestApplicationId]"
+                >
+                  {{ application.candidateFullName || '#' + application.candidateId }}
+                </a>
+                <app-status-tag kind="vacancyApplication" [value]="application.status" />
+                @if (application.selectedBySystem) {
+                  <span class="text-xs text-surface-500">{{ 'staff-vacancies.applications.by-system' | lang }}</span>
+                }
+              </div>
+              <span class="text-xs text-surface-500">
+                {{ 'staff-meetings.vote.FOR' | lang }}: {{ application.votesFor ?? 0 }} ·
+                {{ 'staff-meetings.vote.AGAINST' | lang }}: {{ application.votesAgainst ?? 0 }}
+                @if (application.responseDeadline) {
+                  · {{ 'staff-vacancies.applications.deadline' | lang }}
+                  {{ application.responseDeadline | serverDateTime }}
+                }
+              </span>
+              @if (application.sunushFileId) {
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                  <span class="text-surface-500">{{ 'staff-vacancies.applications.sunush' | lang }}:</span>
+                  <app-file-link [fileId]="application.sunushFileId" />
+                  @if (application.sunushConfirmed) {
+                    <i
+                      class="pi pi-verified text-green-600"
+                      [title]="'staff-vacancies.applications.sunush-confirmed' | lang"
+                      aria-hidden="true"
+                    ></i>
+                  }
+                </div>
+              }
+            </div>
+            <div class="flex flex-wrap gap-2">
+              @if (appCan.generateSunush) {
+                <p-button
+                  size="small"
+                  icon="pi pi-file-pdf"
+                  [label]="'staff-vacancies.actions.sunush' | lang"
+                  [loading]="busy() === 'application-' + application.id"
+                  (onClick)="generateSunush(application)"
+                />
+              }
+              @if (appCan.confirmSunush) {
+                <p-button
+                  size="small"
+                  icon="pi pi-check"
+                  severity="success"
+                  [label]="'staff-vacancies.actions.confirm-sunush' | lang"
+                  [loading]="busy() === 'application-' + application.id"
+                  (onClick)="confirmSunush(application)"
+                />
+              }
+            </div>
+          </li>
+        } @empty {
+          <li class="text-sm text-surface-500">{{ 'staff-vacancies.applications.empty' | lang }}</li>
+        }
+      </ul>
+    </section>
+
+    <app-vacancy-form-dialog [(visible)]="editing" [vacancy]="item" (saved)="onSaved($event)" />
+
+    <p-dialog
+      styleClass="w-full max-w-md mx-4"
+      [modal]="true"
+      [header]="'staff-vacancies.meeting.title' | lang"
+      [visible]="scheduling()"
+      (visibleChange)="scheduling.set($event)"
+    >
+      <div class="flex flex-col gap-4">
+        <p-message
+          severity="info"
+          icon="pi pi-info-circle"
+          [text]="'staff-vacancies.meeting.hint' | lang: { count: submittedCount() }"
+        />
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-medium" for="vacancy-meeting-start">{{
+            'staff-meetings.schedule.start' | lang
+          }}</label>
+          <p-datepicker
+            inputId="vacancy-meeting-start"
+            dateFormat="dd.mm.yy"
+            appendTo="body"
+            styleClass="w-full"
+            [showTime]="true"
+            [showIcon]="true"
+            [minDate]="now"
+            [ngModel]="meetingStart()"
+            (ngModelChange)="meetingStart.set($event)"
+          />
+        </div>
+        <div class="flex flex-wrap justify-end gap-2">
+          <p-button
+            severity="secondary"
+            [text]="true"
+            [label]="'shell.actions.cancel' | lang"
+            (onClick)="scheduling.set(false)"
+          />
+          <p-button
+            icon="pi pi-calendar-plus"
+            [label]="'staff-meetings.schedule.submit' | lang"
+            [loading]="busy() === 'meeting'"
+            [disabled]="!meetingStart()"
+            (onClick)="scheduleMeeting()"
+          />
+        </div>
+      </div>
+    </p-dialog>
+  }
+</div>

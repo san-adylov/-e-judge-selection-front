@@ -1,0 +1,149 @@
+<section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+  <div class="flex flex-wrap items-center gap-3">
+    <h2 class="m-0 flex-1 text-base font-semibold">{{ 'staff-meetings.opening.title' | lang }}</h2>
+    <p-selectbutton
+      optionLabel="label"
+      optionValue="value"
+      [options]="typeOptions()"
+      [allowEmpty]="false"
+      [ngModel]="type()"
+      (ngModelChange)="setType($event)"
+    />
+  </div>
+
+  @if (!allVoted()) {
+    <p-message severity="warn" icon="pi pi-clock" [text]="'staff-meetings.opening.not-all-voted' | lang" />
+  } @else if (summary(); as result) {
+    <p-message
+      [severity]="result.approved ? 'success' : 'error'"
+      [icon]="result.approved ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+      [text]="
+        'staff-meetings.opening.outcome'
+          | lang
+            : {
+                result: (result.approved ? 'staff-meetings.vote.approved' : 'staff-meetings.vote.declined') | lang,
+                for: result.votesFor ?? 0,
+                against: result.votesAgainst ?? 0,
+              }
+      "
+    />
+  }
+
+  <div class="rounded-lg bg-surface-50 px-4 py-3 text-sm">
+    <p class="m-0 text-surface-600">{{ 'staff-meetings.opening.council' | lang }}</p>
+    <p class="m-0 mt-1">
+      <span class="text-surface-500">{{ 'staff-meetings.opening.chairman' | lang }}:</span>
+      {{ chairmanName() || '—' }}
+    </p>
+    <p class="m-0">
+      <span class="text-surface-500">{{ 'staff-meetings.opening.board-members' | lang }}:</span>
+      {{ boardMembers().join(', ') || '—' }}
+    </p>
+  </div>
+
+  @if (type() === 'ADMISSION') {
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium" for="opening-pre">{{ 'staff-meetings.opening.pre-solution' | lang }}</label>
+      <textarea
+        pTextarea
+        id="opening-pre"
+        class="w-full"
+        rows="6"
+        [maxlength]="textMax"
+        [placeholder]="'staff-meetings.opening.pre-solution-hint' | lang"
+        [ngModel]="preSolution()"
+        (ngModelChange)="preSolution.set($event)"
+      ></textarea>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-center text-sm font-semibold uppercase">{{ 'staff-meetings.opening.resolved' | lang }}</span>
+      <label class="text-sm font-medium" for="opening-solutions">{{ 'staff-meetings.opening.solutions' | lang }}</label>
+      <textarea
+        pTextarea
+        id="opening-solutions"
+        class="w-full"
+        rows="8"
+        [maxlength]="textMax"
+        [placeholder]="'staff-meetings.opening.solutions-hint' | lang"
+        [ngModel]="solutions()"
+        (ngModelChange)="solutions.set($event)"
+      ></textarea>
+    </div>
+  } @else {
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium" for="opening-summary">{{
+        'staff-meetings.opening.summary-text' | lang
+      }}</label>
+      <textarea
+        pTextarea
+        id="opening-summary"
+        class="w-full"
+        rows="6"
+        [maxlength]="textMax"
+        [placeholder]="'staff-meetings.opening.summary-text-hint' | lang"
+        [ngModel]="summaryText()"
+        (ngModelChange)="summaryText.set($event)"
+      ></textarea>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-center text-sm font-semibold uppercase">{{ 'staff-meetings.opening.established' | lang }}</span>
+      <label class="text-sm font-medium" for="opening-found">{{ 'staff-meetings.opening.found' | lang }}</label>
+      <textarea
+        pTextarea
+        id="opening-found"
+        class="w-full"
+        rows="6"
+        [maxlength]="textMax"
+        [placeholder]="'staff-meetings.opening.found-hint' | lang"
+        [ngModel]="found()"
+        (ngModelChange)="found.set($event)"
+      ></textarea>
+    </div>
+    <div class="flex flex-col gap-1">
+      <span class="text-center text-sm font-semibold uppercase">{{ 'staff-meetings.opening.resolved' | lang }}</span>
+      <label class="text-sm font-medium" for="opening-decision">{{
+        'staff-meetings.opening.summary-decision' | lang
+      }}</label>
+      <textarea
+        pTextarea
+        id="opening-decision"
+        class="w-full"
+        rows="8"
+        [maxlength]="textMax"
+        [placeholder]="'staff-meetings.opening.summary-decision-hint' | lang"
+        [ngModel]="summaryOfTheDecision()"
+        (ngModelChange)="summaryOfTheDecision.set($event)"
+      ></textarea>
+    </div>
+  }
+
+  <div class="flex flex-wrap items-center justify-end gap-2">
+    <p-button
+      icon="pi pi-file-pdf"
+      [label]="'staff-meetings.opening.generate' | lang"
+      [loading]="generating()"
+      [disabled]="!canGenerate()"
+      (onClick)="generate()"
+    />
+  </div>
+
+  @if (files().length) {
+    <ul class="m-0 flex list-none flex-col gap-1 border-t border-surface-100 p-0 pt-3 text-sm">
+      @for (file of files(); track file.id) {
+        <li class="flex flex-wrap items-center gap-2">
+          <i class="pi pi-file-pdf text-red-600" aria-hidden="true"></i>
+          <span class="min-w-0 flex-1 truncate">{{ file.fileName || '#' + file.id }}</span>
+          <p-button
+            size="small"
+            icon="pi pi-download"
+            severity="secondary"
+            [outlined]="true"
+            [label]="'shell.actions.open' | lang"
+            [loading]="downloading() === file.id"
+            (onClick)="download(file)"
+          />
+        </li>
+      }
+    </ul>
+  }
+</section>

@@ -1,0 +1,124 @@
+<app-page-header title="staff-users.title" subtitle="staff-users.subtitle">
+  <ng-container *appAccess="'ADMIN'">
+    <p-button icon="pi pi-user-plus" [label]="'staff-users.create.action' | lang" (onClick)="creating.set(true)" />
+  </ng-container>
+</app-page-header>
+
+<div class="mb-4 flex flex-col gap-3 desktop-s:flex-row desktop-s:items-center">
+  <input
+    pInputText
+    class="w-full desktop-s:w-80"
+    type="search"
+    [placeholder]="'staff-users.filter.query' | lang"
+    [ngModel]="query()"
+    (ngModelChange)="setQuery($event)"
+  />
+  <p-select
+    class="w-full desktop-s:w-64"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [showClear]="true"
+    [options]="roleOptions()"
+    [placeholder]="'staff-users.filter.role' | lang"
+    [ariaLabel]="'staff-users.filter.role' | lang"
+    [ngModel]="role()"
+    (ngModelChange)="setRole($event)"
+  />
+  <p-datepicker
+    class="w-full desktop-s:w-44"
+    dateFormat="dd.mm.yy"
+    appendTo="body"
+    styleClass="w-full"
+    [showIcon]="true"
+    [showClear]="true"
+    [placeholder]="'staff-users.filter.created-from' | lang"
+    [ariaLabel]="'staff-users.filter.created-from' | lang"
+    [ngModel]="createdFrom()"
+    (ngModelChange)="setCreatedFrom($event)"
+  />
+  <p-datepicker
+    class="w-full desktop-s:w-44"
+    dateFormat="dd.mm.yy"
+    appendTo="body"
+    styleClass="w-full"
+    [showIcon]="true"
+    [showClear]="true"
+    [placeholder]="'staff-users.filter.created-to' | lang"
+    [ariaLabel]="'staff-users.filter.created-to' | lang"
+    [ngModel]="createdTo()"
+    (ngModelChange)="setCreatedTo($event)"
+  />
+</div>
+
+<div class="rounded-xl border border-surface-200 bg-surface-0 p-2 tablet:p-4">
+  <app-data-table
+    [rows]="rows()"
+    [columns]="columns()"
+    [loading]="loading()"
+    [total]="total()"
+    [page]="page()"
+    [size]="size()"
+    emptyText="staff-users.empty"
+    (pageChange)="onPage($event)"
+  />
+</div>
+
+<ng-template #rolesCell let-row="row">
+  <span class="flex flex-wrap gap-1">
+    @for (role of row.roles ?? []; track role) {
+      <app-status-tag kind="role" [value]="role" />
+    }
+  </span>
+</ng-template>
+<ng-template #statusCell let-row="row">
+  <app-status-tag kind="userStatus" [value]="row.status" />
+</ng-template>
+<ng-template #actionsCell let-row="row">
+  <span class="flex gap-1">
+    <p-button
+      icon="pi pi-users"
+      severity="secondary"
+      size="small"
+      [text]="true"
+      [ariaLabel]="'staff-users.roles.title' | lang"
+      [disabled]="busy() === row.id"
+      (onClick)="openRoles(row)"
+    />
+    @if (row.status === 'ACTIVE') {
+      <p-button
+        icon="pi pi-lock"
+        severity="warn"
+        size="small"
+        [text]="true"
+        [ariaLabel]="'staff-users.status.INACTIVE-title' | lang"
+        [loading]="busy() === row.id"
+        (onClick)="changeStatus(row, 'INACTIVE')"
+      />
+    } @else if (row.status === 'INACTIVE') {
+      <p-button
+        icon="pi pi-unlock"
+        severity="secondary"
+        size="small"
+        [text]="true"
+        [ariaLabel]="'staff-users.status.ACTIVE-title' | lang"
+        [loading]="busy() === row.id"
+        (onClick)="changeStatus(row, 'ACTIVE')"
+      />
+    }
+    @if (row.status !== 'DELETED') {
+      <p-button
+        icon="pi pi-trash"
+        severity="danger"
+        size="small"
+        [text]="true"
+        [ariaLabel]="'staff-users.status.DELETED-title' | lang"
+        [disabled]="busy() === row.id"
+        (onClick)="changeStatus(row, 'DELETED')"
+      />
+    }
+  </span>
+</ng-template>
+
+<app-user-create-dialog [(visible)]="creating" (created)="reload()" />
+<app-user-roles-dialog [(visible)]="editingRoles" [user]="selected()" (saved)="replace($event)" />

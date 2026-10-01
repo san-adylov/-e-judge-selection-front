@@ -120,5 +120,26 @@
     "JUDGE_INTERVIEW": "Судья менен маектешүү",
     "CREATE_VACANCY": "Бош орунду жарыялоо",
     "CANDIDATE_APPROVAL": "Талапкерди бекитүү"
+  },
+  "decision": {
+    "PENDING": "Түзүлүшүн күтүүдө",
+    "GENERATED": "Түзүлдү",
+    "CONFIRMED": "Ырасталды",
+    "SIGNED": "Кол коюлду"
+  },
+  "role": {
+    "SUPER_ADMIN": "Башкы администратор",
+    "ADMIN": "Администратор",
+    "CHAIRMAN": "Төрага",
+    "VICE_CHAIRMAN": "Төраганын орун басары",
+    "BOARD_MEMBER": "Кеңештин мүчөсү",
+    "SECRETARY": "Катчы",
+    "ACTIVE_JUDGE": "Иштеп жаткан судья",
+    "CANDIDATE": "Талапкер"
+  },
+  "userStatus": {
+    "ACTIVE": "Активдүү",
+    "INACTIVE": "Бөгөттөлгөн",
+    "DELETED": "Өчүрүлгөн"
   }
 }

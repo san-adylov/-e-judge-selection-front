@@ -1,0 +1,111 @@
+<p-dialog
+  styleClass="w-full max-w-3xl mx-4"
+  [modal]="true"
+  [header]="(editing() ? 'staff-essay-topics.edit-title' : 'staff-essay-topics.create-title') | lang"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+>
+  <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()">
+    <app-form-field
+      label="staff-essay-topics.form.theme-ru"
+      inputId="topic-ru"
+      [required]="true"
+      [control]="form.controls.themeRu"
+    >
+      <textarea
+        pTextarea
+        id="topic-ru"
+        class="w-full"
+        rows="3"
+        [autoResize]="true"
+        formControlName="themeRu"
+      ></textarea>
+    </app-form-field>
+    <app-form-field
+      label="staff-essay-topics.form.theme-kg"
+      inputId="topic-kg"
+      [required]="true"
+      [control]="form.controls.themeKg"
+    >
+      <textarea
+        pTextarea
+        id="topic-kg"
+        class="w-full"
+        rows="3"
+        [autoResize]="true"
+        formControlName="themeKg"
+      ></textarea>
+    </app-form-field>
+
+    <div class="grid grid-cols-1 gap-4 tablet:grid-cols-2">
+      <app-form-field
+        label="staff-essay-topics.form.time-limit"
+        inputId="topic-limit"
+        [required]="true"
+        [control]="form.controls.timeLimitMinutes"
+      >
+        <p-inputnumber
+          inputId="topic-limit"
+          styleClass="w-full"
+          [min]="1"
+          [useGrouping]="false"
+          suffix=" мин"
+          formControlName="timeLimitMinutes"
+        />
+      </app-form-field>
+      <div class="flex items-center gap-2 pt-6">
+        <p-checkbox inputId="topic-active" [binary]="true" formControlName="active" />
+        <label for="topic-active" class="text-sm font-medium">{{ 'staff-essay-topics.form.active' | lang }}</label>
+      </div>
+    </div>
+
+    <fieldset class="m-0 flex flex-col gap-3 border-0 p-0" formArrayName="subQuestions">
+      <legend class="mb-1 p-0 text-sm font-medium">{{ 'staff-essay-topics.form.questions' | lang }}</legend>
+      @for (question of questions.controls; track question; let i = $index) {
+        <div class="grid grid-cols-[auto_minmax(0,1fr)_minmax(0,1fr)_auto] items-center gap-2" [formGroupName]="i">
+          <span class="text-sm text-surface-500">{{ i + 1 }}.</span>
+          <input
+            pInputText
+            class="w-full"
+            [placeholder]="'staff-essay-topics.form.question-ru' | lang"
+            formControlName="questionRu"
+          />
+          <input
+            pInputText
+            class="w-full"
+            [placeholder]="'staff-essay-topics.form.question-kg' | lang"
+            formControlName="questionKg"
+          />
+          <p-button
+            icon="pi pi-trash"
+            severity="danger"
+            [text]="true"
+            [ariaLabel]="'shell.actions.delete' | lang"
+            (onClick)="removeQuestion(i)"
+          />
+        </div>
+      }
+      <p-button
+        class="self-start"
+        size="small"
+        icon="pi pi-plus"
+        severity="secondary"
+        [outlined]="true"
+        [label]="'staff-essay-topics.form.add-question' | lang"
+        [disabled]="questions.length >= maxQuestions"
+        (onClick)="addQuestion()"
+      />
+      <small class="text-surface-500">{{ 'staff-essay-topics.form.questions-hint' | lang }}</small>
+    </fieldset>
+
+    <div class="flex flex-wrap justify-end gap-2">
+      <p-button
+        severity="secondary"
+        [text]="true"
+        [label]="'shell.actions.cancel' | lang"
+        (onClick)="visible.set(false)"
+      />
+      <p-button type="submit" icon="pi pi-save" [label]="'shell.actions.save' | lang" [loading]="saving()" />
+    </div>
+  </form>
+</p-dialog>

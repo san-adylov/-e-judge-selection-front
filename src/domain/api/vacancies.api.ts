@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, type HttpContext } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 
@@ -42,8 +42,8 @@ export class VacanciesApi {
     return this.http.post<S['Selection']>(`${VACANCIES}/${id}/select-from-reserve`, null);
   }
 
-  get(id: number): Observable<Vacancy> {
-    return this.http.get<Vacancy>(`${VACANCIES}/${id}`);
+  get(id: number, context?: HttpContext): Observable<Vacancy> {
+    return this.http.get<Vacancy>(`${VACANCIES}/${id}`, { context });
   }
 
   list(status?: Vacancy['status'], query: PageQuery = {}): Observable<Page<Vacancy>> {

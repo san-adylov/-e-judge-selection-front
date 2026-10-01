@@ -1,0 +1,94 @@
+<app-page-header title="staff-judges.title" subtitle="staff-judges.subtitle" />
+
+<div class="mb-4 flex flex-col gap-3 desktop-s:flex-row desktop-s:items-center">
+  <p-selectbutton
+    optionLabel="label"
+    optionValue="value"
+    [options]="tabOptions()"
+    [allowEmpty]="false"
+    [ngModel]="tab()"
+    (ngModelChange)="setTab($event)"
+  />
+  @if (tab() === 'applications') {
+    <p-select
+      class="w-full desktop-s:w-80"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      [showClear]="true"
+      [options]="statusOptions()"
+      [placeholder]="'staff-judges.filter.under-review' | lang"
+      [ariaLabel]="'staff-judges.filter.status' | lang"
+      [ngModel]="status()"
+      (ngModelChange)="setStatus($event)"
+    />
+  } @else {
+    <p-select
+      class="w-full desktop-s:w-80"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      [showClear]="true"
+      [options]="confirmationOptions()"
+      [placeholder]="'staff-judges.filter.all-statuses' | lang"
+      [ariaLabel]="'staff-judges.filter.status' | lang"
+      [ngModel]="confirmationStatus()"
+      (ngModelChange)="setConfirmationStatus($event)"
+    />
+  }
+</div>
+
+<div class="flex max-w-5xl flex-col gap-3">
+  @if (loading()) {
+    @for (row of [1, 2, 3]; track row) {
+      <p-skeleton height="5rem" borderRadius="0.75rem" />
+    }
+  } @else if (tab() === 'applications') {
+    @for (item of applications(); track item.id) {
+      <a
+        class="flex flex-wrap items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-4 text-inherit no-underline transition-colors hover:border-primary"
+        [routerLink]="[baseUrl, 'applications', item.id]"
+      >
+        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span class="font-medium">{{ name(item.judgeUserId) }}</span>
+          <span class="text-sm text-surface-500">
+            {{ item.contestName || '—' }}
+            @if (item.registrationNumber) {
+              · № {{ item.registrationNumber }}
+            }
+          </span>
+        </span>
+        <app-status-tag kind="judgeApplication" [value]="item.status" />
+        <span class="text-sm text-surface-500">{{ item.submittedAt || item.createdAt | serverDateTime }}</span>
+        <i class="pi pi-angle-right text-surface-400" aria-hidden="true"></i>
+      </a>
+    } @empty {
+      <div class="rounded-xl border border-surface-200 bg-surface-0 p-8 text-center text-surface-500">
+        {{ 'staff-judges.empty-applications' | lang }}
+      </div>
+    }
+  } @else {
+    @for (item of confirmations(); track item.id) {
+      <a
+        class="flex flex-wrap items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-4 text-inherit no-underline transition-colors hover:border-primary"
+        [routerLink]="[baseUrl, 'confirmations', item.id]"
+      >
+        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span class="font-medium">{{ name(item.userId) }}</span>
+          <span class="text-sm text-surface-500">{{ item.courtName || '—' }}</span>
+        </span>
+        <app-status-tag kind="judgeConfirmation" [value]="item.status" />
+        <span class="text-sm text-surface-500">{{ item.submittedAt || item.createdAt | serverDateTime }}</span>
+        <i class="pi pi-angle-right text-surface-400" aria-hidden="true"></i>
+      </a>
+    } @empty {
+      <div class="rounded-xl border border-surface-200 bg-surface-0 p-8 text-center text-surface-500">
+        {{ 'staff-judges.empty-confirmations' | lang }}
+      </div>
+    }
+  }
+
+  @if (total() > size) {
+    <p-paginator [rows]="size" [first]="page() * size" [totalRecords]="total()" (onPageChange)="onPage($event)" />
+  }
+</div>

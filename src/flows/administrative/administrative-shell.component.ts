@@ -38,7 +38,7 @@ const NAV: NavSection[] = [
       { label: 'shell.nav.tests', icon: 'pi pi-list-check', link: `${BASE}/tests` },
       { label: 'shell.nav.essay-topics', icon: 'pi pi-book', link: `${BASE}/essay-topics`, access: 'ADMIN' },
       { label: 'shell.nav.directories', icon: 'pi pi-database', link: `${BASE}/directories`, access: 'ADMIN' },
-      { label: 'shell.nav.users', icon: 'pi pi-user-edit', link: `${BASE}/users` },
+      { label: 'shell.nav.users', icon: 'pi pi-user-edit', link: `${BASE}/users`, access: ['ADMIN', 'CHAIRMAN'] },
       { label: 'shell.nav.audit', icon: 'pi pi-history', link: `${BASE}/audit`, access: 'ADMIN' },
     ],
   },

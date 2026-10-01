@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signa
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { LangPipe, LangService } from '@reforgium/presentia';
-import { Button } from 'primeng/button';
 import { Paginator, type PaginatorState } from 'primeng/paginator';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
@@ -35,7 +34,7 @@ const PAGE_SIZE = 20;
     FormsModule,
     LangPipe,
     ServerDateTimePipe,
-    Button,
+
     Paginator,
     Select,
     SelectButton,

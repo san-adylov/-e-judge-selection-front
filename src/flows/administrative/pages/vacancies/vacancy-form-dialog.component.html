@@ -1,0 +1,145 @@
+<p-dialog
+  styleClass="w-full max-w-2xl mx-4"
+  [modal]="true"
+  [header]="(editing() ? 'staff-vacancies.form.edit-title' : 'staff-vacancies.form.create-title') | lang"
+  [visible]="visible()"
+  (visibleChange)="visible.set($event)"
+>
+  <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="submit()">
+    @if (!editing()) {
+      <p class="m-0 text-sm text-surface-600">{{ 'staff-vacancies.form.create-hint' | lang }}</p>
+    }
+
+    <app-form-field
+      label="staff-vacancies.form.contest"
+      inputId="vacancy-contest"
+      [required]="true"
+      [control]="form.controls.contestId"
+    >
+      <p-select
+        inputId="vacancy-contest"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+        [filter]="true"
+        [options]="contestOptions()"
+        [loading]="contestsLoading()"
+        [placeholder]="'shell.form.select' | lang"
+        formControlName="contestId"
+      />
+    </app-form-field>
+
+    <app-form-field
+      label="staff-vacancies.form.name"
+      inputId="vacancy-name"
+      [required]="true"
+      [control]="form.controls.name"
+    >
+      <input pInputText id="vacancy-name" class="w-full" [maxlength]="500" formControlName="name" />
+    </app-form-field>
+
+    <app-form-field
+      label="staff-vacancies.form.description"
+      inputId="vacancy-description"
+      [control]="form.controls.description"
+    >
+      <textarea
+        pTextarea
+        id="vacancy-description"
+        class="w-full"
+        rows="4"
+        [autoResize]="true"
+        [maxlength]="4000"
+        formControlName="description"
+      ></textarea>
+    </app-form-field>
+
+    <div class="grid grid-cols-1 gap-4 tablet:grid-cols-3">
+      <app-form-field
+        label="staff-vacancies.form.quantity"
+        inputId="vacancy-quantity"
+        [required]="true"
+        [control]="form.controls.quantity"
+      >
+        <p-inputnumber
+          inputId="vacancy-quantity"
+          styleClass="w-full"
+          [min]="1"
+          [useGrouping]="false"
+          formControlName="quantity"
+        />
+      </app-form-field>
+      <app-form-field
+        label="staff-vacancies.form.start"
+        inputId="vacancy-start"
+        [required]="true"
+        [control]="form.controls.startDate"
+      >
+        <p-datepicker
+          inputId="vacancy-start"
+          dateFormat="dd.mm.yy"
+          appendTo="body"
+          styleClass="w-full"
+          [showIcon]="true"
+          formControlName="startDate"
+        />
+      </app-form-field>
+      <app-form-field
+        label="staff-vacancies.form.end"
+        inputId="vacancy-end"
+        [required]="true"
+        [control]="form.controls.endDate"
+      >
+        <p-datepicker
+          inputId="vacancy-end"
+          dateFormat="dd.mm.yy"
+          appendTo="body"
+          styleClass="w-full"
+          [showIcon]="true"
+          [minDate]="form.controls.startDate.value"
+          formControlName="endDate"
+        />
+      </app-form-field>
+    </div>
+    @if (form.hasError('dateRange')) {
+      <small class="text-red-600">{{ 'shell.form.date-range' | lang }}</small>
+    }
+
+    @if (!editing()) {
+      <app-form-field
+        label="staff-vacancies.form.meeting-start"
+        inputId="vacancy-meeting"
+        [required]="true"
+        hint="staff-vacancies.form.meeting-hint"
+        [control]="form.controls.meetingStart"
+      >
+        <p-datepicker
+          inputId="vacancy-meeting"
+          dateFormat="dd.mm.yy"
+          appendTo="body"
+          styleClass="w-full"
+          [showTime]="true"
+          [showIcon]="true"
+          [minDate]="now"
+          formControlName="meetingStart"
+        />
+      </app-form-field>
+    }
+
+    <div class="flex flex-wrap justify-end gap-2">
+      <p-button
+        severity="secondary"
+        [text]="true"
+        [label]="'shell.actions.cancel' | lang"
+        (onClick)="visible.set(false)"
+      />
+      <p-button
+        type="submit"
+        icon="pi pi-save"
+        [label]="(editing() ? 'shell.actions.save' : 'staff-vacancies.form.create') | lang"
+        [loading]="saving()"
+      />
+    </div>
+  </form>
+</p-dialog>

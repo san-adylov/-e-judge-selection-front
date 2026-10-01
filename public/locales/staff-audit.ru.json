@@ -1,0 +1,78 @@
+{
+  "title": "Журнал аудита",
+  "subtitle": "Действия пользователей во всех сервисах системы",
+  "empty": "Записей нет",
+  "details": "Запись журнала",
+  "filter": {
+    "username": "Логин",
+    "event": "Код события, например APPLICATION_SUBMIT",
+    "entity": "Объект",
+    "action": "Действие",
+    "result": "Результат",
+    "reset": "Сбросить"
+  },
+  "columns": {
+    "occurred-at": "Время",
+    "user": "Пользователь",
+    "event": "Событие",
+    "entity": "Объект",
+    "action": "Действие",
+    "request": "Запрос",
+    "result": "Результат"
+  },
+  "fields": {
+    "route": "Маршрут",
+    "service": "Сервис и длительность",
+    "client": "Адрес и клиент",
+    "trace": "Трассировка"
+  },
+  "result": {
+    "success": "Успешно",
+    "failure": "Ошибка"
+  },
+  "action": {
+    "LOGIN": "Вход",
+    "LOGOUT": "Выход",
+    "REGISTRATION": "Регистрация",
+    "VIEW": "Просмотр",
+    "SAVE": "Создание",
+    "UPDATE": "Изменение",
+    "DELETE": "Удаление",
+    "EXPORT": "Выгрузка",
+    "IMPORT": "Импорт",
+    "PRINT": "Печать",
+    "PROCESS": "Обработка",
+    "CONFIGURE": "Настройка"
+  },
+  "entity": {
+    "AUTH": "Аутентификация",
+    "USER": "Пользователь",
+    "PROFILE": "Личное дело",
+    "PROFILE_SECTION": "Раздел личного дела",
+    "ADDITIONAL_INFO": "Дополнительные сведения",
+    "APPLICATION": "Заявка",
+    "CONTEST": "Конкурс",
+    "QUESTION_BANK": "Банк вопросов",
+    "TEST": "Тест",
+    "ESSAY": "Эссе",
+    "MEETING": "Заседание",
+    "VOTE": "Голосование",
+    "INTERVIEW": "Собеседование",
+    "DOCUMENT_ASSESSMENT": "Оценка документов",
+    "COMPLAINT": "Жалоба",
+    "DECISION": "Решение",
+    "DOCUMENT": "Документ",
+    "FILE": "Файл",
+    "SIGNATURE": "Электронная подпись",
+    "JUDGE_CONFIRMATION": "Подтверждение статуса судьи",
+    "JUDGE_APPLICATION": "Заявка судьи",
+    "VACANCY": "Вакансия",
+    "VACANCY_APPLICATION": "Отклик на вакансию",
+    "RESERVE": "Резерв",
+    "NOTIFICATION": "Уведомление",
+    "DIRECTORY": "Справочник",
+    "HOLIDAY": "Праздничный день",
+    "SETTINGS": "Настройки",
+    "REFERENCE_DOCUMENT": "Справочный документ"
+  }
+}

@@ -1,0 +1,102 @@
+<div class="mb-4 flex flex-col gap-3 desktop-s:flex-row desktop-s:items-center">
+  <p-select
+    class="w-full desktop-s:w-80"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [filter]="true"
+    [options]="codeOptions()"
+    [ariaLabel]="'staff-directories.items.directory' | lang"
+    [ngModel]="code()"
+    (ngModelChange)="setCode($event)"
+  />
+  <input
+    pInputText
+    class="w-full desktop-s:w-72"
+    type="search"
+    [placeholder]="'shell.form.search' | lang"
+    [ngModel]="search()"
+    (ngModelChange)="setSearch($event)"
+  />
+  <div class="flex items-center gap-2">
+    <p-toggleswitch inputId="dir-active-only" [ngModel]="activeOnly()" (ngModelChange)="setActiveOnly($event)" />
+    <label for="dir-active-only" class="text-sm">{{ 'staff-directories.items.active-only' | lang }}</label>
+  </div>
+  <span class="flex flex-wrap gap-2 desktop-s:ml-auto">
+    @if (external()) {
+      <p-button
+        icon="pi pi-sync"
+        severity="secondary"
+        [outlined]="true"
+        [label]="'staff-directories.items.sync' | lang"
+        [loading]="syncing()"
+        (onClick)="sync()"
+      />
+    }
+    @if (editable()) {
+      <p-button icon="pi pi-plus" [label]="'staff-directories.items.create-action' | lang" (onClick)="open(null)" />
+    }
+  </span>
+</div>
+
+@if (external()) {
+  <p class="mb-3 text-sm text-surface-500">{{ 'staff-directories.items.external-hint' | lang }}</p>
+}
+
+<div class="flex flex-col gap-2">
+  @if (loading()) {
+    @for (row of [1, 2, 3, 4]; track row) {
+      <p-skeleton height="3.25rem" borderRadius="0.75rem" />
+    }
+  } @else {
+    @for (item of items(); track item.id) {
+      <article class="flex flex-wrap items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 px-4 py-2">
+        <div class="flex min-w-0 flex-1 flex-col">
+          <span class="truncate font-medium" [class.text-surface-400]="item.active === false">{{ name(item) }}</span>
+          <span class="truncate text-xs text-surface-500">
+            #{{ item.id }}
+            @if (item.code) {
+              · {{ item.code }}
+            }
+            @if (item.parentId) {
+              · {{ 'staff-directories.items.parent' | lang }} #{{ item.parentId }}
+            }
+            @if (item.sortOrder !== undefined) {
+              · {{ 'staff-directories.items.sort-order' | lang }} {{ item.sortOrder }}
+            }
+          </span>
+        </div>
+        <p-tag
+          [severity]="item.active === false ? 'secondary' : 'success'"
+          [value]="(item.active === false ? 'staff-directories.inactive' : 'staff-directories.active') | lang"
+        />
+        @if (editable()) {
+          <p-button
+            icon="pi pi-pencil"
+            severity="secondary"
+            [text]="true"
+            [ariaLabel]="'shell.actions.edit' | lang"
+            (onClick)="open(item)"
+          />
+        }
+        <p-button
+          [icon]="item.active === false ? 'pi pi-eye' : 'pi pi-eye-slash'"
+          severity="secondary"
+          [text]="true"
+          [ariaLabel]="(item.active === false ? 'staff-directories.activate' : 'staff-directories.deactivate') | lang"
+          [loading]="busy() === item.id"
+          (onClick)="toggle(item)"
+        />
+      </article>
+    } @empty {
+      <div class="rounded-xl border border-surface-200 bg-surface-0 p-8 text-center text-surface-500">
+        {{ 'staff-directories.items.empty' | lang }}
+      </div>
+    }
+  }
+  @if (total() > size) {
+    <p-paginator [rows]="size" [first]="page() * size" [totalRecords]="total()" (onPageChange)="onPage($event)" />
+  }
+</div>
+
+<app-directory-item-dialog [(visible)]="editing" [code]="code()" [item]="selected()" (saved)="reload()" />

@@ -7,7 +7,7 @@ import { firstValueFrom } from 'rxjs';
 import { skipErrorToast } from '../api/http-context';
 import { environment } from '../config/environment';
 import { type AccessRule, hasAccess } from './access-groups';
-import { signInUrlFor } from './areas';
+import { rolesOf, signInUrlFor } from './areas';
 import type { AuthMethod, Session, TokenResponse } from './auth.models';
 import { stageExerciseOf } from './jwt';
 
@@ -31,7 +31,7 @@ export class SessionService {
 
   readonly session = this.state.asReadonly();
   readonly user = computed(() => this.state()?.user ?? null);
-  readonly roles = computed(() => this.state()?.user.roles ?? []);
+  readonly roles = computed(() => rolesOf(this.state()?.user));
   readonly isAuthenticated = computed(() => this.state() !== null);
   readonly stage = computed(() => this.state()?.stage ?? null);
   readonly expiringSoon = signal(false);
