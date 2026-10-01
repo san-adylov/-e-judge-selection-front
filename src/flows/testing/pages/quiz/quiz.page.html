@@ -20,13 +20,7 @@
         <p-message severity="error" [text]="store.loadError() || ('quiz.error.generic' | lang)" />
         <div class="flex flex-col gap-2 tablet:flex-row">
           <p-button icon="pi pi-refresh" [label]="'quiz.error.retry' | lang" (onClick)="reload()" />
-          <p-button
-            icon="pi pi-sign-out"
-            severity="secondary"
-            [outlined]="true"
-            [label]="'quiz.result.logout' | lang"
-            (onClick)="logout()"
-          />
+          <app-stage-exit />
         </div>
       </section>
     }
@@ -36,7 +30,7 @@
       <div
         class="sticky top-16 z-[5] flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-surface-200 bg-surface-0 px-3 py-2 shadow-sm tablet:px-4"
       >
-        <app-quiz-timer [seconds]="store.secondsLeft()" (warn)="onWarn($event)" />
+        <app-stage-timer [seconds]="store.secondsLeft()" (warn)="onWarn($event)" />
 
         <div class="min-w-0 flex-1">
           <p class="m-0 truncate text-sm font-medium">

@@ -4,7 +4,6 @@ import { TestBed } from '@angular/core/testing';
 import { LangService } from '@reforgium/presentia';
 
 import { SKIP_ERROR_TOAST } from '@shared/api/http-context';
-import { SessionService } from '@shared/auth/session.service';
 
 import {
   AUTO_SUBMIT_SECONDS,
@@ -47,7 +46,6 @@ function submission(overrides: Partial<Submission> = {}): Submission {
 describe('EssayWorkStore', () => {
   let store: EssayWorkStore;
   let backend: HttpTestingController;
-  let logout: ReturnType<typeof vi.fn>;
 
   const expectMy = (applicationId: string | null = null): TestRequest =>
     backend.expectOne((request) => request.url === MY && request.params.get('applicationId') === applicationId);
@@ -59,14 +57,12 @@ describe('EssayWorkStore', () => {
     vi.useFakeTimers();
     vi.setSystemTime(NOW);
     sessionStorage.clear();
-    logout = vi.fn().mockResolvedValue(undefined);
 
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         EssayWorkStore,
-        { provide: SessionService, useValue: { logout } },
         { provide: LangService, useValue: { get: (key: string) => key, currentLang: () => 'ru' } },
       ],
     });
@@ -249,7 +245,7 @@ describe('EssayWorkStore', () => {
 
     beforeEach(() => sessionStorage.setItem(draftKey(7), serializeDraft(['ответ'], NOW)));
 
-    it('объявляет пороги 5 и 1 минуты', () => {
+    it('уровень таймера меняется на 5 и 1 минуте; сами пороги объявляет компонент таймера', () => {
       store.load();
       flushMy(deadlineIn(5 * 60 + 2));
 
@@ -257,13 +253,12 @@ describe('EssayWorkStore', () => {
 
       vi.advanceTimersByTime(2000);
 
-      expect(store.announcement()).toBe('essay.timer.warning-5');
-      expect(store.level()).toBe('warn');
+      expect(store.level()).toBe('warning');
+      expect(store.announcement()).toBe('');
 
       vi.advanceTimersByTime(4 * 60 * 1000);
 
-      expect(store.announcement()).toBe('essay.timer.warning-1');
-      expect(store.level()).toBe('danger');
+      expect(store.level()).toBe('critical');
 
       backend.expectNone(REPLY);
     });
@@ -303,14 +298,14 @@ describe('EssayWorkStore', () => {
     });
   });
 
-  it('выход удаляет черновик и завершает сеанс', async () => {
+  it('перед выходом черновик удаляется с устройства', () => {
     sessionStorage.setItem(draftKey(7), serializeDraft(['ответ'], NOW));
     store.load();
     flushMy(submission());
 
-    await store.logout();
+    store.discardDraft();
 
     expect(sessionStorage.getItem(draftKey(7))).toBeNull();
-    expect(logout).toHaveBeenCalledOnce();
+    expect(store.savedAt()).toBeNull();
   });
 });

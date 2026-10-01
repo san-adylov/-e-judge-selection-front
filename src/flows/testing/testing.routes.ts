@@ -5,8 +5,6 @@ import { access, stageSignIn } from '@shared/auth/guards';
 import { ShellLayoutComponent } from '@shared/ui/layout/shell-layout.component';
 import { CenteredLayoutComponent } from '@shared/ui/page/centered-layout.component';
 
-import { screen } from '../screen';
-
 @Component({
   selector: 'app-testing-shell',
   imports: [ShellLayoutComponent],
@@ -28,23 +26,14 @@ export const TESTING_ROUTES: Routes = [
     component: TestingShellComponent,
     canMatch: [access('CANDIDATE')],
     children: [
-      screen({
-        path: 'quiz/:testId',
+      // `:testId` — `exerciseId` из токена этапа; чужой id страница отправляет на свой экран.
+      { path: 'quiz/:testId', title: 'shell.nav.quiz', loadComponent: () => import('./pages/quiz/quiz.page') },
+      {
+        path: 'quiz/:testId/result',
         title: 'shell.nav.quiz',
-        access: 'CANDIDATE',
-        api: [
-          'GET /tests/{testId}',
-          'POST /tests/{testId}/questions/{number}/answer',
-          'POST /tests/{testId}/finish',
-          'GET /tests/{testId}/result',
-        ],
-      }),
-      screen({
-        path: 'essay',
-        title: 'shell.nav.essay',
-        access: 'CANDIDATE',
-        api: ['GET /essay/my', 'PUT /essay/my/reply'],
-      }),
+        loadComponent: () => import('./pages/quiz/quiz-result.page'),
+      },
+      { path: 'essay', title: 'shell.nav.essay', loadComponent: () => import('./pages/essay/essay.page') },
     ],
   },
 ];

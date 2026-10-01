@@ -107,5 +107,18 @@
     "OPENED": "Открыто",
     "APPROVED": "Утверждено",
     "DECLINED": "Отклонено"
+  },
+  "meetingType": {
+    "OPEN_COMPETITION": "Открытие конкурса",
+    "DOCUMENT_REVIEW": "Допуск по документам",
+    "CALENDAR_APPROVAL": "Утверждение календарного плана",
+    "INTERVIEW": "Собеседование",
+    "COMPLAINT_REVIEW": "Рассмотрение жалобы",
+    "CLOSE_COMPETITION": "Закрытие конкурса",
+    "JUDGE_DOCUMENT_REVIEW": "Документы судьи",
+    "PROFESSIONAL_ASSESSMENT_APPROVAL": "Утверждение профессиональной оценки",
+    "JUDGE_INTERVIEW": "Собеседование с судьёй",
+    "CREATE_VACANCY": "Объявление вакансии",
+    "CANDIDATE_APPROVAL": "Утверждение кандидата"
   }
 }

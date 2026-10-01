@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, concatMap, EMPTY, map, type Observable, Subject, tap } from 'rxjs';
 
 import { TestsApi } from '@domain/api/tests.api';
+import { secondsLeft } from '@features/stage-timer/stage-timer.logic';
 import { apiErrorOf } from '@shared/api/api-error';
 import { skipErrorToast } from '@shared/api/http-context';
 
@@ -13,7 +14,6 @@ import {
   nextUnanswered,
   paletteItems,
   QUIZ_ERRORS,
-  secondsLeft,
   sortQuestions,
   type TestResult,
   type TestView,

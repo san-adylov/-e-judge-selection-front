@@ -5,8 +5,10 @@ import { Button } from 'primeng/button';
 import { Message } from 'primeng/message';
 import { Textarea } from 'primeng/textarea';
 
+import { StageTimerComponent } from '@features/stage-timer/stage-timer.component';
+import { NotifyService } from '@shared/ui/notify.service';
+
 import { AUTO_SUBMIT_SECONDS, textStats, unansweredNumbers } from './essay.logic';
-import { EssayTimerComponent } from './essay-timer.component';
 import { EssayWorkStore } from './essay-work.store';
 
 const TIME = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -17,7 +19,7 @@ const TIME = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digi
  */
 @Component({
   selector: 'app-essay-writing',
-  imports: [LangPipe, Button, Message, Textarea, EssayTimerComponent],
+  imports: [LangPipe, Button, Message, Textarea, StageTimerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './essay-writing.component.html',
   host: { class: 'flex flex-col gap-4' },
@@ -26,6 +28,7 @@ export class EssayWritingComponent {
   protected readonly store = inject(EssayWorkStore);
   private readonly confirm = inject(ConfirmationService);
   private readonly lang = inject(LangService);
+  private readonly notify = inject(NotifyService);
 
   protected readonly autoSubmitSeconds = AUTO_SUBMIT_SECONDS;
   protected readonly emptyError = signal(false);
@@ -48,6 +51,10 @@ export class EssayWritingComponent {
     effect(() => {
       if (this.store.phase() !== 'writing') untracked(() => this.confirm.close());
     });
+  }
+
+  protected onWarn(threshold: number): void {
+    this.notify.warn(this.lang.get('shell.stage.warn-title'), this.lang.get(`shell.stage.warn-${threshold}`));
   }
 
   protected onInput(index: number, event: Event): void {

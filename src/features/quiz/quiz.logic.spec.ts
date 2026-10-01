@@ -1,18 +1,16 @@
+import { secondsLeft } from '@features/stage-timer/stage-timer.logic';
+
 import {
   adjacentNumber,
   deadlineAt,
-  formatCountdown,
   nextUnanswered,
   paletteItems,
   quizAccess,
   type QuizQuestion,
   resultSummary,
-  secondsLeft,
   sortQuestions,
-  timerLevel,
   toggleOption,
   unansweredNumbers,
-  warningToAnnounce,
 } from './quiz.logic';
 
 const q = (number: number, answered = false): QuizQuestion => ({ number, answered, choiceType: 'SINGLE' });
@@ -33,31 +31,6 @@ describe('quiz timer math', () => {
   it('treats missing or negative remainingSeconds as expired', () => {
     expect(deadlineAt(undefined, 5_000)).toBe(5_000);
     expect(deadlineAt(-10, 5_000)).toBe(5_000);
-  });
-
-  it('formats hours, minutes and seconds', () => {
-    expect(formatCountdown(7200)).toBe('2:00:00');
-    expect(formatCountdown(3661)).toBe('1:01:01');
-    expect(formatCountdown(3599)).toBe('59:59');
-    expect(formatCountdown(65)).toBe('01:05');
-    expect(formatCountdown(0)).toBe('00:00');
-    expect(formatCountdown(-3)).toBe('00:00');
-  });
-
-  it('switches level at 5 minutes and 1 minute', () => {
-    expect(timerLevel(301)).toBe('normal');
-    expect(timerLevel(300)).toBe('warning');
-    expect(timerLevel(61)).toBe('warning');
-    expect(timerLevel(60)).toBe('critical');
-  });
-
-  it('announces each warning once and only the most urgent one after a resume', () => {
-    expect(warningToAnnounce(400, new Set())).toBeNull();
-    expect(warningToAnnounce(300, new Set())).toBe(300);
-    expect(warningToAnnounce(200, new Set([300]))).toBeNull();
-    expect(warningToAnnounce(60, new Set([300]))).toBe(60);
-    expect(warningToAnnounce(30, new Set())).toBe(60);
-    expect(warningToAnnounce(0, new Set())).toBeNull();
   });
 });
 

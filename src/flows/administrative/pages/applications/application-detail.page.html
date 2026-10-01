@@ -1,0 +1,261 @@
+<div class="flex max-w-5xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    [routerLink]="baseUrl"
+    [queryParams]="{ contestId: application()?.contestId }"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'staff-applications.detail.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="10rem" borderRadius="0.75rem" />
+    <p-skeleton height="14rem" borderRadius="0.75rem" />
+  } @else if (notFound() || !application()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-file-excel text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.not-found' | lang }}</p>
+      <a pButton [routerLink]="baseUrl">
+        <i pButtonIcon class="pi pi-list"></i>
+        <span pButtonLabel>{{ 'staff-applications.detail.back' | lang }}</span>
+      </a>
+    </section>
+  } @else {
+    @let app = application()!;
+    @let can = actions();
+
+    <header class="flex flex-col gap-3 desktop-s:flex-row desktop-s:items-start">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <app-status-tag kind="application" [value]="app.status" />
+          @if (app.registrationNumber) {
+            <span class="text-sm text-surface-500">№ {{ app.registrationNumber }}</span>
+          }
+        </div>
+        <h1 class="m-0 text-2xl font-semibold break-words">
+          {{ candidateName() || ('staff-applications.detail.candidate-unknown' | lang) }}
+        </h1>
+        <a
+          class="text-sm text-primary no-underline hover:underline"
+          [routerLink]="['/administrative/contests', app.contestId]"
+        >
+          {{ app.contestName || ('applications.card.no-contest-name' | lang) }}
+        </a>
+      </div>
+
+      @if (can) {
+        <div class="flex flex-wrap gap-2">
+          @if (can.register) {
+            <p-button
+              icon="pi pi-check-square"
+              [label]="'staff-applications.actions.register' | lang"
+              [loading]="busy()"
+              (onClick)="register()"
+            />
+          }
+          @if (can.returnForCorrection) {
+            <p-button
+              icon="pi pi-undo"
+              severity="warn"
+              [outlined]="true"
+              [label]="'staff-applications.actions.return' | lang"
+              [disabled]="busy()"
+              (onClick)="returning.set(true)"
+            />
+          }
+          @if (can.reassign) {
+            <p-button
+              icon="pi pi-user-edit"
+              severity="secondary"
+              [outlined]="true"
+              [label]="'staff-applications.actions.reassign' | lang"
+              [disabled]="busy()"
+              (onClick)="reassigning.set(true)"
+            />
+          }
+          @if (can.cancel) {
+            <p-button
+              icon="pi pi-times"
+              severity="danger"
+              [outlined]="true"
+              [label]="'staff-applications.actions.cancel' | lang"
+              [disabled]="busy()"
+              (onClick)="cancel()"
+            />
+          }
+        </div>
+      }
+    </header>
+
+    @if (app.status === 'RETURNED_FOR_CORRECTION' && app.returnReason) {
+      <p-message severity="warn" icon="pi pi-undo">
+        <div class="flex flex-col gap-1">
+          <span class="font-semibold">{{ 'staff-applications.detail.return-reason' | lang }}</span>
+          <span class="whitespace-pre-line">{{ app.returnReason }}</span>
+        </div>
+      </p-message>
+    }
+
+    @if (can?.ready) {
+      <section
+        class="flex flex-col gap-3 rounded-xl border border-primary-200 bg-primary-50 p-4 tablet:flex-row tablet:items-center tablet:p-5"
+      >
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <h2 class="m-0 text-base font-semibold">{{ 'staff-applications.ready.title' | lang }}</h2>
+          <p class="m-0 text-sm text-surface-700">{{ 'staff-applications.ready.hint' | lang }}</p>
+        </div>
+        <div class="inline-flex items-center gap-3 text-sm font-medium">
+          <p-toggleswitch
+            inputId="reporter-ready"
+            [ngModel]="app.reporterReady ?? false"
+            [disabled]="busy()"
+            (ngModelChange)="setReady($event)"
+          />
+          <label for="reporter-ready">
+            {{ (app.reporterReady ? 'staff-applications.ready.yes' : 'staff-applications.ready.no') | lang }}
+          </label>
+        </div>
+      </section>
+    }
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <dl class="m-0 grid grid-cols-1 gap-x-6 gap-y-3 text-sm tablet:grid-cols-2 desktop-s:grid-cols-4">
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'staff-applications.fields.reporter' | lang }}</dt>
+          <dd class="m-0 font-medium">
+            @if (app.reporterId) {
+              <i
+                class="pi mr-1 text-xs"
+                aria-hidden="true"
+                [class.pi-check-circle]="app.reporterReady"
+                [class.text-green-600]="app.reporterReady"
+                [class.pi-circle]="!app.reporterReady"
+                [class.text-surface-400]="!app.reporterReady"
+              ></i>
+              {{ (app.reporterReady ? 'staff-applications.ready.yes' : 'staff-applications.ready.no') | lang }}
+            } @else {
+              {{ 'staff-applications.fields.no-reporter' | lang }}
+            }
+          </dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'applications.fields.created-at' | lang }}</dt>
+          <dd class="m-0">{{ app.createdAt | serverDateTime }}</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'applications.fields.updated-at' | lang }}</dt>
+          <dd class="m-0">{{ app.updatedAt | serverDateTime }}</dd>
+        </div>
+        <div class="flex flex-col">
+          <dt class="text-surface-500">{{ 'applications.fields.preferred-language' | lang }}</dt>
+          <dd class="m-0">
+            {{ app.preferredLanguage ? ('applications.language.' + app.preferredLanguage | lang) : '—' }}
+          </dd>
+        </div>
+        @if (app.essayScore !== undefined && app.essayScore !== null) {
+          <div class="flex flex-col">
+            <dt class="text-surface-500">{{ 'staff-applications.fields.essay-score' | lang }}</dt>
+            <dd class="m-0 font-medium">{{ app.essayScore }}</dd>
+          </div>
+        }
+        @if (app.appointedToVacancy) {
+          <div class="flex flex-col">
+            <dt class="text-surface-500">{{ 'staff-applications.fields.appointed' | lang }}</dt>
+            <dd class="m-0 font-medium">{{ 'shell.form.yes' | lang }}</dd>
+          </div>
+        }
+      </dl>
+
+      <div class="mt-4 flex flex-wrap gap-2 border-t border-surface-200 pt-3">
+        @if (app.candidateId) {
+          <a
+            pButton
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            [routerLink]="['/administrative/candidates', app.candidateId]"
+          >
+            <i pButtonIcon class="pi pi-id-card"></i>
+            <span pButtonLabel>{{ 'staff-applications.detail.to-candidate' | lang }}</span>
+          </a>
+        }
+        @if (canAssess()) {
+          <a
+            pButton
+            size="small"
+            severity="secondary"
+            [outlined]="true"
+            routerLink="/administrative/document-assessment"
+            [queryParams]="{ applicationId: app.id }"
+          >
+            <i pButtonIcon class="pi pi-check-square"></i>
+            <span pButtonLabel>{{ 'staff-applications.detail.to-assessment' | lang }}</span>
+          </a>
+        }
+      </div>
+    </section>
+
+    @if (summary(); as total) {
+      <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 mb-1 text-base font-semibold">{{ 'staff-applications.assessment.title' | lang }}</h2>
+        <p class="m-0 text-sm text-surface-600">
+          {{
+            'staff-applications.assessment.summary'
+              | lang
+                : {
+                    score: total.rawTotal ?? 0,
+                    max: total.maxTotal ?? 0,
+                    scored: scoredSections().scored,
+                    total: scoredSections().total,
+                  }
+          }}
+        </p>
+      </section>
+    }
+
+    <div class="grid grid-cols-1 gap-4 tablet:grid-cols-2">
+      <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 mb-3 text-base font-semibold">{{ 'applications.detail.stages' | lang }}</h2>
+        <dl class="m-0 flex flex-col gap-3 text-sm">
+          @for (stage of ['test', 'essay', 'interview']; track stage) {
+            @let date = stage === 'test' ? app.testDate : stage === 'essay' ? app.essayDate : app.interviewDate;
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <dt class="text-surface-500">{{ 'applications.stage.' + stage | lang }}</dt>
+              <dd class="m-0" [class.font-medium]="!!date" [class.text-surface-400]="!date">
+                {{ date | serverDateTime: ('applications.stage.not-scheduled' | lang) }}
+              </dd>
+            </div>
+          }
+        </dl>
+      </section>
+
+      <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 mb-3 text-base font-semibold">{{ 'applications.detail.contacts' | lang }}</h2>
+        <dl class="m-0 flex flex-col gap-3 text-sm">
+          @for (field of contactFields; track field.key) {
+            <div class="flex flex-col">
+              <dt class="text-surface-500">{{ 'applications.fields.' + field.label | lang }}</dt>
+              <dd class="m-0 break-words whitespace-pre-line">{{ app[field.key] || '—' }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    </div>
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <h2 class="m-0 mb-4 text-base font-semibold">{{ 'applications.history.title' | lang }}</h2>
+      <app-application-history [history]="history()" [createdAt]="app.createdAt" />
+    </section>
+
+    @if (app.id; as id) {
+      <app-application-return-dialog [applicationId]="id" [(visible)]="returning" (returned)="replace($event)" />
+      <app-application-reassign-dialog
+        [applicationId]="id"
+        [currentReporterId]="app.reporterId"
+        [(visible)]="reassigning"
+        (reassigned)="replace($event)"
+      />
+    }
+  }
+</div>

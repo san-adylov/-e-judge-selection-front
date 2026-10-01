@@ -1,0 +1,104 @@
+<app-page-header title="staff-essay.title" subtitle="staff-essay.subtitle" />
+
+<div class="mb-4 flex flex-col gap-3 desktop-s:flex-row desktop-s:items-center">
+  <p-select
+    class="w-full desktop-s:w-96"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [filter]="true"
+    [options]="contestOptions()"
+    [loading]="contestsLoading()"
+    [placeholder]="'staff-applications.filter.contest' | lang"
+    [ariaLabel]="'staff-applications.filter.contest' | lang"
+    [ngModel]="contestId()"
+    (ngModelChange)="setContest($event)"
+  />
+  <p-selectbutton
+    optionLabel="label"
+    optionValue="value"
+    [options]="modeOptions()"
+    [allowEmpty]="false"
+    [ngModel]="mode()"
+    (ngModelChange)="setMode($event)"
+  />
+</div>
+
+@if (contestId() === null) {
+  <section class="flex flex-col items-center gap-2 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+    <i class="pi pi-pen-to-square text-3xl text-surface-400" aria-hidden="true"></i>
+    <p class="m-0 text-surface-600">{{ 'staff-essay.select-contest' | lang }}</p>
+  </section>
+} @else {
+  <div class="grid grid-cols-1 gap-4 desktop-s:grid-cols-[minmax(0,1fr)_20rem] desktop-s:items-start">
+    <section class="flex flex-col gap-3">
+      @if (loading()) {
+        @for (row of [1, 2, 3]; track row) {
+          <p-skeleton height="4.5rem" borderRadius="0.75rem" />
+        }
+      } @else {
+        @for (item of items(); track item.id; let i = $index) {
+          @let mine = myScoreOf()(item);
+          <button
+            type="button"
+            class="flex w-full cursor-pointer flex-wrap items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-4 text-left text-inherit transition-colors hover:border-primary"
+            (click)="open(i)"
+          >
+            <span class="min-w-0 flex-1">
+              <span class="block font-medium">{{ item.candidateFullName || '—' }}</span>
+              <span class="block text-sm text-surface-500">
+                @if (item.registrationNumber) {
+                  № {{ item.registrationNumber }} ·
+                }
+                {{ item.finishedAt | serverDateTime }}
+              </span>
+            </span>
+            @if (mine !== null) {
+              <span class="inline-flex items-center gap-1 text-sm text-green-700">
+                <i class="pi pi-check-circle" aria-hidden="true"></i>
+                {{ 'staff-essay.list.my-score' | lang: { score: mine } }}
+              </span>
+            }
+            <span class="text-sm text-surface-500">
+              {{ 'staff-essay.list.scores' | lang: { count: item.scores?.length ?? 0 } }}
+            </span>
+            @if (item.averageScore !== undefined && item.averageScore !== null) {
+              <span class="font-semibold tabular-nums">{{ item.averageScore }}</span>
+            }
+            <i class="pi pi-angle-right text-surface-400" aria-hidden="true"></i>
+          </button>
+        } @empty {
+          <div class="rounded-xl border border-surface-200 bg-surface-0 p-8 text-center text-surface-500">
+            {{ (mode() === 'queue' ? 'staff-essay.list.queue-empty' : 'staff-essay.list.empty') | lang }}
+          </div>
+        }
+      }
+
+      @if (total() > size) {
+        <p-paginator [rows]="size" [first]="page() * size" [totalRecords]="total()" (onPageChange)="onPage($event)" />
+      }
+    </section>
+
+    <aside class="rounded-xl border border-surface-200 bg-surface-0 p-4">
+      <h2 class="m-0 mb-3 text-base font-semibold">{{ 'staff-essay.progress.title' | lang }}</h2>
+      <ul class="m-0 flex list-none flex-col gap-2 p-0 text-sm">
+        @for (reviewer of progress(); track reviewer.reviewerId) {
+          <li class="flex items-center justify-between gap-2">
+            <span class="min-w-0 truncate">{{ reviewer.reviewerFullName || '—' }}</span>
+            <span class="tabular-nums text-surface-600">{{ reviewer.reviewed ?? 0 }} / {{ reviewer.total ?? 0 }}</span>
+          </li>
+        } @empty {
+          <li class="text-surface-500">{{ 'staff-essay.progress.empty' | lang }}</li>
+        }
+      </ul>
+    </aside>
+  </div>
+}
+
+<app-essay-reader
+  [(visible)]="readerOpen"
+  [submission]="current()"
+  [position]="position()"
+  (navigate)="move($event)"
+  (scored)="onScored($event)"
+/>

@@ -5,8 +5,6 @@ import { localized } from '@shared/lib/language';
 export type Submission = Schemas['EssaySubmissionResponse'];
 export type ReplyRequest = Schemas['EssayReplyRequest'];
 
-/** Пороги предупреждений таймера, секунды: 5 и 1 минута. */
-export const WARNING_THRESHOLDS = [300, 60] as const;
 /**
  * За сколько секунд до срока работа уходит автоматически. Черновиков на сервере нет, а после срока
  * бэкенд отвечает 4313 — текст нужно успеть отправить с запасом на сеть.
@@ -48,36 +46,6 @@ export function remainingAtResponse(
 
   // M = 0 бывает и после срока (бэкенд делает max(0, …)), поэтому нижняя граница — 0, а не 0·60.
   return Math.max(0, Math.min(high, minutes === 0 ? estimate : Math.max(low, estimate)));
-}
-
-/** Остаток к моменту `now` по отметке окончания `endsAt` (обе — по одним часам). */
-export function secondsLeft(endsAt: number, now: number): number {
-  return Math.max(0, Math.ceil((endsAt - now) / 1000));
-}
-
-/** `ч:мм:сс` от часа, иначе `мм:сс`. */
-export function formatCountdown(seconds: number): string {
-  const total = Math.max(0, Math.floor(seconds));
-  const hours = Math.floor(total / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const rest = total % 60;
-  const pad = (value: number) => String(value).padStart(2, '0');
-
-  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(rest)}` : `${pad(minutes)}:${pad(rest)}`;
-}
-
-export type TimerLevel = 'normal' | 'warn' | 'danger';
-
-export function timerLevel(seconds: number): TimerLevel {
-  if (seconds <= WARNING_THRESHOLDS[1]) return 'danger';
-  if (seconds <= WARNING_THRESHOLDS[0]) return 'warn';
-
-  return 'normal';
-}
-
-/** Порог, который пересёк таймер между двумя отсчётами (для объявления), иначе `null`. */
-export function crossedThreshold(previous: number, current: number): number | null {
-  return WARNING_THRESHOLDS.find((limit) => previous > limit && current <= limit) ?? null;
 }
 
 // ---------- Тема и ответы ----------

@@ -5,6 +5,7 @@ import { Button } from 'primeng/button';
 import { Message } from 'primeng/message';
 import { Skeleton } from 'primeng/skeleton';
 
+import { StageExitComponent } from '@features/stage-timer/stage-exit.component';
 import { homeUrl } from '@shared/auth/areas';
 import { SessionService } from '@shared/auth/session.service';
 
@@ -19,7 +20,16 @@ import { EssayWritingComponent } from './essay-writing.component';
  */
 @Component({
   selector: 'app-essay-page',
-  imports: [LangPipe, Button, Message, Skeleton, EssayIntroComponent, EssayWritingComponent, EssayResultComponent],
+  imports: [
+    LangPipe,
+    Button,
+    Message,
+    Skeleton,
+    StageExitComponent,
+    EssayIntroComponent,
+    EssayWritingComponent,
+    EssayResultComponent,
+  ],
   providers: [EssayWorkStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -38,15 +48,9 @@ import { EssayWritingComponent } from './essay-writing.component';
           <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
             <h1 class="m-0 text-xl font-semibold">{{ 'essay.error.title' | lang }}</h1>
             <p-message severity="error" [text]="store.loadError() ?? ('essay.error.generic' | lang)" />
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-col gap-2 tablet:flex-row">
               <p-button icon="pi pi-refresh" [label]="'essay.error.retry' | lang" (onClick)="reload()" />
-              <p-button
-                icon="pi pi-sign-out"
-                severity="secondary"
-                [outlined]="true"
-                [label]="'essay.result.logout' | lang"
-                (onClick)="store.logout()"
-              />
+              <app-stage-exit (exiting)="store.discardDraft()" />
             </div>
           </section>
         }

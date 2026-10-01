@@ -4,14 +4,13 @@ import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core'
 import { LangService } from '@reforgium/presentia';
 
 import { EssayApi } from '@domain/api/essay.api';
+import { secondsLeft, timerLevel } from '@features/stage-timer/stage-timer.logic';
 import { apiErrorOf } from '@shared/api/api-error';
 import { skipErrorToast } from '@shared/api/http-context';
-import { SessionService } from '@shared/auth/session.service';
 import { localized } from '@shared/lib/language';
 
 import {
   AUTO_SUBMIT_SECONDS,
-  crossedThreshold,
   ESSAY_ERRORS,
   type EssayPhase,
   initialPhase,
@@ -19,9 +18,7 @@ import {
   questionsOf,
   remainingAtResponse,
   RETRY_DELAY_MS,
-  secondsLeft,
   type Submission,
-  timerLevel,
   toReplyRequest,
 } from './essay.logic';
 import { DraftBackup, safeSessionStorage } from './essay-draft';
@@ -39,7 +36,6 @@ export type SubmitMode = 'manual' | 'auto';
 @Injectable()
 export class EssayWorkStore {
   private readonly api = inject(EssayApi);
-  private readonly session = inject(SessionService);
   private readonly lang = inject(LangService);
   private readonly document = inject(DOCUMENT);
   private readonly draft = new DraftBackup(safeSessionStorage(this.document.defaultView));
@@ -58,7 +54,7 @@ export class EssayWorkStore {
   readonly savedAt = this.draft.savedAt.asReadonly();
   readonly saveFailed = this.draft.failed.asReadonly();
   readonly loadError = signal<string | null>(null);
-  /** Текст для `aria-live`: предупреждения таймера и автоотправка. */
+  /** Текст для `aria-live`: автоотправка (пороги времени объявляет сам таймер). */
   readonly announcement = signal('');
   readonly finishedBy = signal<SubmitMode | null>(null);
 
@@ -132,9 +128,9 @@ export class EssayWorkStore {
     this.send(mode);
   }
 
-  async logout(): Promise<void> {
+  /** Перед выходом: черновик на устройстве больше не нужен, следующий кандидат его не увидит. */
+  discardDraft(): void {
     this.draft.remove();
-    await this.session.logout();
   }
 
   private send(mode: SubmitMode): void {
@@ -237,17 +233,12 @@ export class EssayWorkStore {
   }
 
   private tick(): void {
-    const previous = this.remaining();
     const current = secondsLeft(this.endsAt, Date.now());
     const phase = this.phase();
 
     this.remaining.set(current);
 
     if (phase !== 'intro' && phase !== 'writing') return;
-
-    const crossed = crossedThreshold(previous, current);
-
-    if (crossed !== null) this.announcement.set(this.lang.get(`essay.timer.warning-${crossed / 60}`));
 
     if (phase === 'writing' && current <= AUTO_SUBMIT_SECONDS) {
       this.announcement.set(this.lang.get('essay.timer.auto-submit'));

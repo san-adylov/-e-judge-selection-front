@@ -1,7 +1,7 @@
 {
   "sidebar": {
     "general": "Главное",
-    "dashboard" : "Дашборд",
+    "dashboard": "Дашборд",
     "contests": "Сынактар",
     "candidates": "Менин талапкерлерим",
     "reserve-candidates": "Талапкерлердин резерви",
@@ -12,7 +12,7 @@
     "essay": "Жазуу иштери",
     "interview": "Маектешүү",
     "open-contest": "Сынакты жарыялоо",
-    "candidateInfo":"Талапкер жөнүндө маалымат",
+    "candidateInfo": "Талапкер жөнүндө маалымат",
     "results": "Сынак жыйынтыгы",
     "viewCandidate": "Арызды көрүү",
     "vacancies": "Бош орундар"

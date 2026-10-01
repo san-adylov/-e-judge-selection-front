@@ -1,17 +1,13 @@
 import {
-  crossedThreshold,
   draftKey,
-  formatCountdown,
   initialPhase,
   normalizeAnswers,
   parseDraft,
   questionsOf,
   remainingAtResponse,
-  secondsLeft,
   serializeDraft,
   type Submission,
   textStats,
-  timerLevel,
   toReplyRequest,
   unansweredNumbers,
 } from './essay.logic';
@@ -53,32 +49,6 @@ describe('essay.logic', () => {
       expect(remainingAtResponse({ remainingMinutes: 3 }, null, 0)).toBe(180);
       expect(remainingAtResponse({ deadline: DEADLINE, remainingMinutes: 0, submitted: true }, null, 0)).toBe(0);
     });
-  });
-
-  it('secondsLeft округляет вверх и не уходит в минус', () => {
-    expect(secondsLeft(10_000, 8_001)).toBe(2);
-    expect(secondsLeft(10_000, 10_000)).toBe(0);
-    expect(secondsLeft(10_000, 12_000)).toBe(0);
-  });
-
-  it('formatCountdown: мм:сс до часа, ч:мм:сс от часа', () => {
-    expect(formatCountdown(0)).toBe('00:00');
-    expect(formatCountdown(65)).toBe('01:05');
-    expect(formatCountdown(3599)).toBe('59:59');
-    expect(formatCountdown(5400)).toBe('1:30:00');
-    expect(formatCountdown(-3)).toBe('00:00');
-  });
-
-  it('timerLevel и crossedThreshold: предупреждения на 5 и 1 минуте', () => {
-    expect(timerLevel(301)).toBe('normal');
-    expect(timerLevel(300)).toBe('warn');
-    expect(timerLevel(60)).toBe('danger');
-
-    expect(crossedThreshold(301, 300)).toBe(300);
-    expect(crossedThreshold(305, 290)).toBe(300);
-    expect(crossedThreshold(61, 60)).toBe(60);
-    expect(crossedThreshold(300, 299)).toBeNull();
-    expect(crossedThreshold(59, 58)).toBeNull();
   });
 
   describe('вопросы и ответы', () => {

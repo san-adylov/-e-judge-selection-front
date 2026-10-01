@@ -5,6 +5,16 @@ export function toLocalDate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+/**
+ * `LocalDateTime` бэкенда без зоны: `yyyy-MM-ddTHH:mm:ss` по часам устройства. Сотрудники работают
+ * в часовом поясе сервера (Asia/Bishkek), поэтому локальное время и есть серверное.
+ */
+export function toServerDateTime(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, '0');
+
+  return `${toLocalDate(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+}
+
 /** Разбирает `yyyy-MM-dd` как локальную дату (а не UTC, как `new Date('yyyy-MM-dd')`). */
 export function parseLocalDate(value: string | null | undefined): Date | null {
   const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})/);

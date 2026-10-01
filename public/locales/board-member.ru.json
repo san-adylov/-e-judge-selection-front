@@ -1,7 +1,7 @@
 {
   "sidebar": {
     "general": "Главное",
-    "dashboard" : "Дашборд",
+    "dashboard": "Дашборд",
     "contests": "Конкурсы",
     "candidates": "Мои претенденты",
     "reserve-candidates": "Резерв Кандидатов",
@@ -12,7 +12,7 @@
     "essay": "Письменное задание",
     "interview": "Собеседования",
     "open-contest": "Публикация конкурса",
-    "candidateInfo":"Информация о кандидате",
+    "candidateInfo": "Информация о кандидате",
     "results": "Итоги конкурсов",
     "viewCandidate": "Просмотр заявки",
     "vacancies": "Вакансии"

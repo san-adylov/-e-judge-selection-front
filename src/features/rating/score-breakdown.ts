@@ -29,6 +29,11 @@ export const DEFAULT_SCORE_WEIGHTS: Readonly<ScoreWeights> = {
 
 export const SCORE_PARTS: readonly ScorePartKey[] = ['documents', 'test', 'essay', 'interview'];
 
+/** Максимум оценки одного проверяющего за эссе (`tandoo.scoring.essayMaxScore`, по умолчанию 10). */
+export const ESSAY_MAX_SCORE = 10;
+/** Максимум балла по одному критерию собеседования (`tandoo.scoring.interviewMaxScore`, по умолчанию 10). */
+export const INTERVIEW_MAX_SCORE = 10;
+
 export interface ScorePart {
   key: ScorePartKey;
   /** Взвешенный балл составляющей (как пришёл с бэкенда, 0 — если этап не пройден или не проводился). */

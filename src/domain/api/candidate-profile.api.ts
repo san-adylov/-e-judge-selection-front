@@ -28,8 +28,9 @@ export class CandidateProfileApi {
     return this.http.put<Profile>(`${BASE}/profile`, body);
   }
 
-  ofUser(userId: number): Observable<Profile> {
-    return this.http.get<Profile>(`${BASE}/profile/${userId}`);
+  /** Владелец или сотрудник; 404 (4041), пока кандидат не заполнил личные данные. */
+  ofUser(userId: number, context?: HttpContext): Observable<Profile> {
+    return this.http.get<Profile>(`${BASE}/profile/${userId}`, { context });
   }
 
   full(userId: number): Observable<S['FullProfileResponse']> {
@@ -52,7 +53,7 @@ export class CandidateProfileApi {
     return this.http.get<S['BanStatusResponse']>(`${BASE}/ban-status`, { context });
   }
 
-  banStatusOf(userId: number): Observable<S['BanStatusResponse']> {
-    return this.http.get<S['BanStatusResponse']>(`${BASE}/${userId}/ban-status`);
+  banStatusOf(userId: number, context?: HttpContext): Observable<S['BanStatusResponse']> {
+    return this.http.get<S['BanStatusResponse']>(`${BASE}/${userId}/ban-status`, { context });
   }
 }

@@ -1,0 +1,435 @@
+<div class="flex max-w-5xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    [routerLink]="contest()?.id ? [baseUrl, contest()!.id] : baseUrl"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'staff-contests.edit.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="18rem" borderRadius="0.75rem" />
+    <p-skeleton height="12rem" borderRadius="0.75rem" />
+  } @else if (failed()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-exclamation-circle text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.load-error' | lang }}</p>
+      <p-button icon="pi pi-refresh" [label]="'shell.actions.retry' | lang" (onClick)="retry()" />
+    </section>
+  } @else if (notFound() || !contest()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-search text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.not-found' | lang }}</p>
+      <a pButton [routerLink]="baseUrl">
+        <i pButtonIcon class="pi pi-list"></i>
+        <span pButtonLabel>{{ 'staff-contests.detail.back' | lang }}</span>
+      </a>
+    </section>
+  } @else if (readonlyStatus()) {
+    <p-message severity="warn" icon="pi pi-lock" [text]="'staff-contests.edit.final' | lang" />
+  } @else {
+    <h1 class="m-0 text-2xl font-semibold">{{ 'staff-contests.edit.title' | lang }}</h1>
+
+    <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="save()">
+      <!-- Основное -->
+      <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 text-base font-semibold">{{ 'staff-contests.edit.main' | lang }}</h2>
+
+        <app-form-field
+          label="staff-contests.form.name"
+          inputId="c-name"
+          [required]="true"
+          [control]="form.controls.name"
+        >
+          <input pInputText id="c-name" class="w-full" [maxlength]="nameMax" formControlName="name" />
+        </app-form-field>
+
+        <div class="grid grid-cols-1 gap-4 tablet:grid-cols-2">
+          <app-form-field label="staff-contests.form.type" inputId="c-type" [control]="form.controls.type">
+            <p-select
+              inputId="c-type"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              [showClear]="true"
+              [options]="typeOptions()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="type"
+            />
+          </app-form-field>
+          <app-form-field
+            label="staff-contests.form.court-instance"
+            inputId="c-court"
+            [control]="form.controls.courtInstanceId"
+          >
+            <p-select
+              inputId="c-court"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              [showClear]="true"
+              [filter]="true"
+              [options]="courtInstances()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="courtInstanceId"
+            />
+          </app-form-field>
+          <app-form-field
+            label="staff-contests.form.vacant-places"
+            inputId="c-places"
+            [control]="form.controls.vacantPlaces"
+          >
+            <p-inputnumber
+              inputId="c-places"
+              styleClass="w-full"
+              [min]="1"
+              [useGrouping]="false"
+              formControlName="vacantPlaces"
+            />
+          </app-form-field>
+          <app-form-field
+            label="staff-contests.form.announcement"
+            inputId="c-announcement"
+            hint="staff-contests.form.announcement-hint"
+          >
+            <app-file-upload
+              category="CONTEST_ANNOUNCEMENT"
+              accept=".pdf,.doc,.docx"
+              formControlName="announcementFileId"
+              (uploadingChange)="uploading.set($event)"
+            />
+          </app-form-field>
+          <app-form-field
+            label="staff-contests.form.start-date"
+            inputId="c-start"
+            [control]="form.controls.startDate"
+            hint="staff-contests.form.start-date-hint"
+          >
+            <p-datepicker
+              inputId="c-start"
+              dateFormat="dd.mm.yy"
+              appendTo="body"
+              styleClass="w-full"
+              [showIcon]="true"
+              [showClear]="true"
+              formControlName="startDate"
+            />
+          </app-form-field>
+          <app-form-field
+            label="staff-contests.form.end-date"
+            inputId="c-end"
+            [control]="form.controls.documentAcceptanceEndDate"
+          >
+            <p-datepicker
+              inputId="c-end"
+              dateFormat="dd.mm.yy"
+              appendTo="body"
+              styleClass="w-full"
+              [showIcon]="true"
+              [showClear]="true"
+              [minDate]="form.controls.startDate.value"
+              formControlName="documentAcceptanceEndDate"
+            />
+          </app-form-field>
+        </div>
+        @if (form.hasError('acceptanceRange')) {
+          <p-message severity="error" size="small" [text]="'staff-contests.form.acceptance-range' | lang" />
+        }
+      </section>
+
+      <!-- Тексты -->
+      <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 text-base font-semibold">{{ 'staff-contests.edit.texts' | lang }}</h2>
+        <app-form-field
+          label="staff-contests.fields.description"
+          inputId="c-description"
+          [control]="form.controls.description"
+        >
+          <textarea
+            pTextarea
+            id="c-description"
+            class="w-full"
+            rows="6"
+            [autoResize]="true"
+            [maxlength]="textMax"
+            formControlName="description"
+          ></textarea>
+        </app-form-field>
+        <app-form-field label="staff-contests.fields.note" inputId="c-note" [control]="form.controls.note">
+          <textarea
+            pTextarea
+            id="c-note"
+            class="w-full"
+            rows="3"
+            [autoResize]="true"
+            [maxlength]="textMax"
+            formControlName="note"
+          ></textarea>
+        </app-form-field>
+        <app-form-field
+          label="staff-contests.fields.additional-info"
+          inputId="c-additional"
+          [control]="form.controls.additionalInfo"
+        >
+          <textarea
+            pTextarea
+            id="c-additional"
+            class="w-full"
+            rows="3"
+            [autoResize]="true"
+            [maxlength]="textMax"
+            formControlName="additionalInfo"
+          ></textarea>
+        </app-form-field>
+      </section>
+
+      <!-- Требования -->
+      <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 text-base font-semibold">{{ 'staff-contests.edit.requirements' | lang }}</h2>
+        <div class="grid grid-cols-1 gap-4 tablet:grid-cols-2">
+          <app-form-field
+            label="contests.detail.requirement.age"
+            inputId="c-age"
+            [control]="form.controls.ageRequirementId"
+          >
+            <p-select
+              inputId="c-age"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              [showClear]="true"
+              [options]="ageRequirements()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="ageRequirementId"
+            />
+          </app-form-field>
+          <app-form-field
+            label="contests.detail.requirement.education"
+            inputId="c-education"
+            [control]="form.controls.educationRequirementId"
+          >
+            <p-select
+              inputId="c-education"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              [showClear]="true"
+              [options]="educationRequirements()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="educationRequirementId"
+            />
+          </app-form-field>
+          <app-form-field
+            label="contests.detail.requirement.work-experience"
+            inputId="c-experience"
+            [control]="form.controls.workExperienceRequirementId"
+          >
+            <p-select
+              inputId="c-experience"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              [showClear]="true"
+              [options]="workExperienceRequirements()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="workExperienceRequirementId"
+            />
+          </app-form-field>
+          <app-form-field
+            label="contests.detail.requirement.citizenship"
+            inputId="c-citizenship"
+            [control]="form.controls.citizenshipId"
+          >
+            <p-select
+              inputId="c-citizenship"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              [showClear]="true"
+              [filter]="true"
+              [options]="citizenships()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="citizenshipId"
+            />
+          </app-form-field>
+          <app-form-field
+            label="contests.detail.requirement.language-level"
+            inputId="c-language"
+            [control]="form.controls.languageLevelId"
+          >
+            <p-select
+              inputId="c-language"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              [showClear]="true"
+              [options]="languageLevels()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="languageLevelId"
+            />
+          </app-form-field>
+          <app-form-field
+            label="staff-contests.form.documents"
+            inputId="c-documents"
+            hint="staff-contests.form.documents-hint"
+            [control]="form.controls.requiredDocumentTypeIds"
+          >
+            <p-multiselect
+              inputId="c-documents"
+              optionLabel="label"
+              optionValue="value"
+              appendTo="body"
+              styleClass="w-full"
+              display="chip"
+              [options]="documentTypes()"
+              [placeholder]="'shell.form.select' | lang"
+              formControlName="requiredDocumentTypeIds"
+            />
+          </app-form-field>
+        </div>
+      </section>
+
+      <!-- Сроки этапов -->
+      <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 text-base font-semibold">{{ 'contests.detail.schedule' | lang }}</h2>
+        <p class="m-0 text-sm text-surface-500">{{ 'staff-contests.form.windows-hint' | lang }}</p>
+        <div class="grid grid-cols-1 gap-4 desktop-s:grid-cols-3">
+          @for (stage of stages; track stage) {
+            @let startKey = stage === 'TESTING' ? 'testingStart' : stage === 'ESSAY' ? 'essayStart' : 'interviewStart';
+            @let endKey = stage === 'TESTING' ? 'testingEnd' : stage === 'ESSAY' ? 'essayEnd' : 'interviewEnd';
+            <fieldset class="m-0 flex flex-col gap-3 rounded-lg border border-surface-200 p-3">
+              <legend class="px-1 text-sm font-medium">{{ 'contests.detail.stage.' + stage | lang }}</legend>
+              <app-form-field label="shell.form.from" [inputId]="'c-' + startKey">
+                <p-datepicker
+                  [inputId]="'c-' + startKey"
+                  dateFormat="dd.mm.yy"
+                  appendTo="body"
+                  styleClass="w-full"
+                  [showTime]="true"
+                  [showIcon]="true"
+                  [showClear]="true"
+                  [formControlName]="startKey"
+                />
+              </app-form-field>
+              <app-form-field label="shell.form.to" [inputId]="'c-' + endKey">
+                <p-datepicker
+                  [inputId]="'c-' + endKey"
+                  dateFormat="dd.mm.yy"
+                  appendTo="body"
+                  styleClass="w-full"
+                  [showTime]="true"
+                  [showIcon]="true"
+                  [showClear]="true"
+                  [formControlName]="endKey"
+                />
+              </app-form-field>
+              @if (form.getError('windowIncomplete') === startKey) {
+                <small class="text-red-600">{{ 'staff-contests.form.window-incomplete' | lang }}</small>
+              } @else if (form.getError('windowRange') === startKey) {
+                <small class="text-red-600">{{ 'shell.form.date-range' | lang }}</small>
+              }
+            </fieldset>
+          }
+        </div>
+      </section>
+
+      <!-- Календарный план -->
+      <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 text-base font-semibold">{{ 'contests.detail.plan' | lang }}</h2>
+        <p class="m-0 text-sm text-surface-500">{{ 'staff-contests.form.plan-hint' | lang }}</p>
+        <div class="flex flex-col gap-3">
+          @for (step of steps(); track step.type) {
+            <div class="grid grid-cols-1 items-start gap-2 tablet:grid-cols-[minmax(0,1fr)_14rem_14rem]">
+              <span class="pt-2 text-sm font-medium">{{ 'contests.detail.step.' + step.type | lang }}</span>
+              <p-datepicker
+                dateFormat="dd.mm.yy"
+                appendTo="body"
+                styleClass="w-full"
+                [showTime]="true"
+                [showIcon]="true"
+                [showClear]="true"
+                [placeholder]="'shell.form.from' | lang"
+                [ariaLabel]="('contests.detail.step.' + step.type | lang) + ': ' + ('shell.form.from' | lang)"
+                [ngModel]="step.start"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="setStep(step.type, 'start', $event)"
+              />
+              <div class="flex flex-col gap-1">
+                <p-datepicker
+                  dateFormat="dd.mm.yy"
+                  appendTo="body"
+                  styleClass="w-full"
+                  [showTime]="true"
+                  [showIcon]="true"
+                  [showClear]="true"
+                  [placeholder]="'shell.form.to' | lang"
+                  [ariaLabel]="('contests.detail.step.' + step.type | lang) + ': ' + ('shell.form.to' | lang)"
+                  [invalid]="stepErrors().has(step.type)"
+                  [ngModel]="step.end"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="setStep(step.type, 'end', $event)"
+                />
+                @if (stepErrors().has(step.type)) {
+                  <small class="text-red-600">{{ 'shell.form.date-range' | lang }}</small>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Тестирование -->
+      <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 text-base font-semibold">{{ 'staff-contests.quotas.title' | lang }}</h2>
+        <p class="m-0 text-sm text-surface-500">{{ 'staff-contests.quotas.hint' | lang }}</p>
+        @if (quotaRows().length) {
+          <div class="flex flex-col gap-2">
+            @for (row of quotaRows(); track row.categoryId) {
+              <div class="flex items-center gap-3">
+                <label class="min-w-0 flex-1 text-sm break-words" [for]="'c-quota-' + row.categoryId">{{
+                  row.name
+                }}</label>
+                <p-inputnumber
+                  [inputId]="'c-quota-' + row.categoryId"
+                  styleClass="w-28"
+                  inputStyleClass="w-28 text-right"
+                  [min]="0"
+                  [useGrouping]="false"
+                  [ngModel]="row.questionCount"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="setQuota(row.categoryId, $event)"
+                />
+              </div>
+            }
+          </div>
+          <p class="m-0 text-sm font-medium">{{ 'staff-contests.quotas.total' | lang: { count: questionTotal() } }}</p>
+        } @else {
+          <p class="m-0 text-sm text-surface-500">{{ 'staff-contests.quotas.no-categories' | lang }}</p>
+        }
+      </section>
+
+      <div
+        class="sticky bottom-0 z-10 flex flex-wrap justify-end gap-2 rounded-xl border border-surface-200 bg-surface-0 p-3 shadow-sm"
+      >
+        <a pButton severity="secondary" [text]="true" [routerLink]="[baseUrl, contest()!.id]">
+          <span pButtonLabel>{{ 'shell.actions.cancel' | lang }}</span>
+        </a>
+        <p-button
+          type="submit"
+          icon="pi pi-save"
+          [label]="'shell.actions.save' | lang"
+          [loading]="saving()"
+          [disabled]="uploading()"
+        />
+      </div>
+    </form>
+  }
+</div>

@@ -2,9 +2,10 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { LangPipe } from '@reforgium/presentia';
 import { Button } from 'primeng/button';
 
+import { formatCountdown } from '@features/stage-timer/stage-timer.logic';
 import { SessionService } from '@shared/auth/session.service';
 
-import { AUTO_SUBMIT_SECONDS, formatCountdown } from './essay.logic';
+import { AUTO_SUBMIT_SECONDS } from './essay.logic';
 import { EssayWorkStore } from './essay-work.store';
 
 /**

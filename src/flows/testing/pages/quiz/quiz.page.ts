@@ -23,7 +23,8 @@ import { quizAccess } from '@features/quiz/quiz.logic';
 import { QuizStore } from '@features/quiz/quiz.store';
 import { QuizPaletteComponent } from '@features/quiz/quiz-palette.component';
 import { QuizQuestionComponent } from '@features/quiz/quiz-question.component';
-import { QuizTimerComponent } from '@features/quiz/quiz-timer.component';
+import { StageExitComponent } from '@features/stage-timer/stage-exit.component';
+import { StageTimerComponent } from '@features/stage-timer/stage-timer.component';
 import { homeUrl } from '@shared/auth/areas';
 import { SessionService } from '@shared/auth/session.service';
 import { NotifyService } from '@shared/ui/notify.service';
@@ -47,7 +48,8 @@ import { finishConfirmMessage, type QuizResultState } from './quiz-page.logic';
     Skeleton,
     QuizPaletteComponent,
     QuizQuestionComponent,
-    QuizTimerComponent,
+    StageTimerComponent,
+    StageExitComponent,
   ],
   providers: [QuizStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -133,7 +135,7 @@ export default class QuizPage implements OnInit {
   }
 
   protected onWarn(threshold: number): void {
-    this.notify.warn(this.lang.get('quiz.timer.warn-title'), this.lang.get(`quiz.timer.warn-${threshold}`));
+    this.notify.warn(this.lang.get('shell.stage.warn-title'), this.lang.get(`shell.stage.warn-${threshold}`));
   }
 
   protected askFinish(): void {
@@ -151,10 +153,6 @@ export default class QuizPage implements OnInit {
       rejectButtonProps: { severity: 'secondary', outlined: true },
       accept: () => this.store.finish(),
     });
-  }
-
-  protected logout(): void {
-    void this.session.logout();
   }
 
   /** Выбранные, но не сохранённые ответы пропадут при закрытии вкладки — браузер спросит подтверждение. */

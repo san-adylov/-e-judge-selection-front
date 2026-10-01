@@ -1,0 +1,281 @@
+<div class="flex max-w-6xl flex-col gap-4">
+  <a
+    class="inline-flex items-center gap-1 self-start text-sm text-primary no-underline hover:underline"
+    [routerLink]="baseUrl"
+  >
+    <i class="pi pi-angle-left text-xs" aria-hidden="true"></i>
+    {{ 'staff-contests.detail.back' | lang }}
+  </a>
+
+  @if (loading()) {
+    <p-skeleton height="2.5rem" width="60%" />
+    <p-skeleton height="8rem" borderRadius="0.75rem" />
+    <p-skeleton height="14rem" borderRadius="0.75rem" />
+  } @else if (failed()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-exclamation-circle text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.load-error' | lang }}</p>
+      <p-button icon="pi pi-refresh" [label]="'shell.actions.retry' | lang" (onClick)="retry()" />
+    </section>
+  } @else if (notFound() || !contest()) {
+    <section class="flex flex-col items-center gap-3 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+      <i class="pi pi-search text-4xl text-surface-400" aria-hidden="true"></i>
+      <p class="m-0 font-medium">{{ 'shell.not-found' | lang }}</p>
+      <a pButton [routerLink]="baseUrl">
+        <i pButtonIcon class="pi pi-list"></i>
+        <span pButtonLabel>{{ 'staff-contests.detail.back' | lang }}</span>
+      </a>
+    </section>
+  } @else {
+    @let item = contest()!;
+
+    <header class="flex flex-col gap-3 desktop-s:flex-row desktop-s:items-start">
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <app-status-tag kind="contestType" [value]="item.type" />
+          <app-status-tag kind="contest" [value]="item.status" />
+          <span class="text-sm text-surface-500">№ {{ item.id }}</span>
+        </div>
+        <h1 class="m-0 text-2xl font-semibold break-words">{{ item.name }}</h1>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        @if (editable()) {
+          <a
+            pButton
+            severity="secondary"
+            [outlined]="true"
+            [routerLink]="[baseUrl, item.id, 'edit']"
+            *appAccess="'SECRETARY'"
+          >
+            <i pButtonIcon class="pi pi-pencil"></i>
+            <span pButtonLabel>{{ 'shell.actions.edit' | lang }}</span>
+          </a>
+        }
+        @if (publishable()) {
+          <p-button
+            *appAccess="'SECRETARY'"
+            icon="pi pi-megaphone"
+            [label]="'staff-contests.actions.publish' | lang"
+            [loading]="acting()"
+            [disabled]="missing().length > 0"
+            (onClick)="publish()"
+          />
+        }
+        @if (cancellable()) {
+          <p-button
+            *appAccess="'CHAIRMAN'"
+            icon="pi pi-times"
+            severity="danger"
+            [outlined]="true"
+            [label]="'staff-contests.actions.cancel' | lang"
+            [loading]="acting()"
+            (onClick)="cancel()"
+          />
+        }
+      </div>
+    </header>
+
+    @if (publishable() && missing().length) {
+      <p-message severity="warn" icon="pi pi-exclamation-triangle">
+        <div class="flex flex-col gap-1 text-sm">
+          <span>{{ 'staff-contests.publish.missing' | lang }}</span>
+          <ul class="m-0 pl-5">
+            @for (field of missing(); track field) {
+              <li>{{ 'staff-contests.publish.field.' + field | lang }}</li>
+            }
+          </ul>
+        </div>
+      </p-message>
+    }
+
+    @if (nextMeeting(); as type) {
+      <p-message severity="info" icon="pi pi-calendar-plus">
+        <div class="flex flex-wrap items-center gap-3 text-sm">
+          <span class="flex-1">
+            {{ 'staff-contests.detail.next-meeting' | lang: { type: ('status.meetingType.' + type | lang) } }}
+          </span>
+          <p-button
+            *appAccess="'COUNCIL'"
+            size="small"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [label]="'staff-contests.detail.schedule-meeting' | lang"
+            (onClick)="goToMeetings()"
+          />
+        </div>
+      </p-message>
+    } @else if (pending()) {
+      <p-message severity="info" icon="pi pi-hourglass" [text]="'staff-contests.detail.pending-meeting' | lang" />
+    }
+
+    <section class="flex flex-col gap-4 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <dl class="m-0 grid grid-cols-1 gap-3 text-sm tablet:grid-cols-2 desktop-s:grid-cols-4">
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-contests.fields.start-date' | lang }}</dt>
+          <dd class="m-0 font-medium">{{ item.startDate | localDate }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-contests.fields.end-date' | lang }}</dt>
+          <dd class="m-0 font-medium">{{ item.documentAcceptanceEndDate | localDate }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-contests.fields.vacant-places' | lang }}</dt>
+          <dd class="m-0 font-medium">{{ item.vacantPlaces ?? '—' }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-contests.fields.court-instance' | lang }}</dt>
+          <dd class="m-0 font-medium break-words">{{ item.courtInstanceName || '—' }}</dd>
+        </div>
+        <div class="flex flex-col gap-0.5">
+          <dt class="text-surface-500">{{ 'staff-contests.fields.created-at' | lang }}</dt>
+          <dd class="m-0 font-medium">{{ item.createdAt | serverDateTime }}</dd>
+        </div>
+        @if (item.completedAt) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-surface-500">{{ 'staff-contests.fields.completed-at' | lang }}</dt>
+            <dd class="m-0 font-medium">{{ item.completedAt | serverDateTime }}</dd>
+          </div>
+        }
+        @if (item.announcementFileId; as fileId) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-surface-500">{{ 'staff-contests.fields.announcement' | lang }}</dt>
+            <dd class="m-0"><app-file-link [fileId]="fileId" /></dd>
+          </div>
+        }
+        @if (item.protocolFileId; as fileId) {
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-surface-500">{{ 'staff-contests.fields.protocol' | lang }}</dt>
+            <dd class="m-0"><app-file-link [fileId]="fileId" /></dd>
+          </div>
+        }
+      </dl>
+
+      <div class="flex flex-wrap gap-2 border-t border-surface-200 pt-3">
+        <a
+          pButton
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          routerLink="/administrative/applications"
+          [queryParams]="{ contestId: item.id }"
+          *appAccess="'COUNCIL'"
+        >
+          <i pButtonIcon class="pi pi-file-edit"></i>
+          <span pButtonLabel>{{ 'staff-contests.detail.to-applications' | lang }}</span>
+        </a>
+        <a
+          pButton
+          size="small"
+          severity="secondary"
+          [outlined]="true"
+          [routerLink]="['/administrative/results', item.id]"
+        >
+          <i pButtonIcon class="pi pi-chart-bar"></i>
+          <span pButtonLabel>{{ 'staff-contests.detail.to-results' | lang }}</span>
+        </a>
+      </div>
+    </section>
+
+    @if (readiness(); as ready) {
+      <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 mb-1 text-base font-semibold">{{ 'staff-contests.readiness.title' | lang }}</h2>
+        <p class="m-0 mb-3 text-sm text-surface-500">
+          {{
+            'staff-contests.readiness.summary'
+              | lang: { ready: ready.reportersReady ?? 0, total: ready.reportersTotal ?? 0 }
+          }}
+        </p>
+        <ul class="m-0 flex list-none flex-col gap-1 p-0 text-sm">
+          @for (reporter of ready.reporters ?? []; track reporter.reporterId) {
+            <li class="flex items-center gap-2">
+              <i
+                class="pi"
+                aria-hidden="true"
+                [class.pi-check-circle]="reporter.ready"
+                [class.text-green-600]="reporter.ready"
+                [class.pi-clock]="!reporter.ready"
+                [class.text-surface-400]="!reporter.ready"
+              ></i>
+              <span class="flex-1">{{ reporter.fullName }}</span>
+              <span class="text-surface-500"
+                >{{ reporter.applicationsReady ?? 0 }} / {{ reporter.applicationsTotal ?? 0 }}</span
+              >
+            </li>
+          } @empty {
+            <li class="text-surface-500">{{ 'staff-contests.readiness.empty' | lang }}</li>
+          }
+        </ul>
+      </section>
+    }
+
+    @if (completion(); as done) {
+      <p-message
+        [severity]="done.ready ? 'success' : 'warn'"
+        [icon]="done.ready ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle'"
+        [text]="
+          (done.ready ? 'staff-contests.completion.ready' : 'staff-contests.completion.pending')
+            | lang: { pending: done.pendingApplications ?? 0, total: done.totalApplications ?? 0 }
+        "
+      />
+    }
+
+    @for (text of texts(); track text.key) {
+      <section class="min-w-0 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+        <h2 class="m-0 mb-3 text-base font-semibold">{{ 'staff-contests.fields.' + text.key | lang }}</h2>
+        <div
+          class="max-w-full overflow-x-auto text-sm leading-6 break-words [&_a]:text-primary [&_a]:underline [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:my-2 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:border-surface-200 [&_td]:p-2 [&_th]:border [&_th]:border-surface-200 [&_th]:p-2 [&_ul]:list-disc [&_ul]:pl-5"
+          [innerHTML]="text.html | safeHtml"
+        ></div>
+      </section>
+    }
+
+    <div class="grid grid-cols-1 gap-4 desktop-s:grid-cols-2">
+      <app-contest-requirements [contest]="item" />
+      <app-contest-schedule [contest]="item" [plan]="plan()" />
+    </div>
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <h2 class="m-0 mb-1 text-base font-semibold">{{ 'staff-contests.quotas.title' | lang }}</h2>
+      @if (quotas().length) {
+        <p class="m-0 mb-3 text-sm text-surface-500">
+          {{ 'staff-contests.quotas.total' | lang: { count: questionTotal() } }}
+        </p>
+        <ul class="m-0 flex list-none flex-col gap-1 p-0 text-sm">
+          @for (quota of quotas(); track quota.id) {
+            <li class="flex items-center gap-2">
+              <span class="flex-1 break-words">{{ quota.name }}</span>
+              <span class="font-medium tabular-nums">{{ quota.count }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="m-0 text-sm text-surface-500">{{ 'staff-contests.quotas.empty' | lang }}</p>
+      }
+    </section>
+
+    <section class="rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-5">
+      <h2 class="m-0 mb-3 text-base font-semibold">{{ 'staff-contests.meetings.title' | lang }}</h2>
+      @if (sortedMeetings().length) {
+        <ul class="m-0 flex list-none flex-col gap-2 p-0">
+          @for (meeting of sortedMeetings(); track meeting.id) {
+            <li>
+              <a
+                class="flex flex-wrap items-center gap-2 rounded-lg border border-surface-200 p-3 text-inherit no-underline transition-colors hover:border-primary"
+                [routerLink]="['/administrative/meetings', meeting.id]"
+              >
+                <app-status-tag kind="meetingType" [value]="meeting.type" />
+                <app-status-tag kind="meeting" [value]="meeting.status" />
+                <span class="text-sm text-surface-500 tablet:ml-auto">{{
+                  meeting.startDateTime | serverDateTime
+                }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="m-0 text-sm text-surface-500">{{ 'staff-contests.meetings.empty' | lang }}</p>
+      }
+    </section>
+  }
+</div>

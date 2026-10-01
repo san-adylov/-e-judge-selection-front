@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { LangPipe } from '@reforgium/presentia';
-import { Button } from 'primeng/button';
 import { Message } from 'primeng/message';
 import { Tag } from 'primeng/tag';
+
+import { StageExitComponent } from '@features/stage-timer/stage-exit.component';
 
 import { resultSummary, type TestResult } from './quiz.logic';
 
@@ -12,7 +13,7 @@ import { resultSummary, type TestResult } from './quiz.logic';
  */
 @Component({
   selector: 'app-quiz-result',
-  imports: [LangPipe, Button, Message, Tag],
+  imports: [LangPipe, Message, Tag, StageExitComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="flex flex-col gap-5 rounded-xl border border-surface-200 bg-surface-0 p-4 tablet:p-6">
@@ -70,12 +71,7 @@ import { resultSummary, type TestResult } from './quiz.logic';
       }
 
       <div class="flex flex-col gap-2 border-t border-surface-200 pt-4 tablet:flex-row tablet:items-center">
-        <p-button
-          styleClass="w-full tablet:w-auto"
-          icon="pi pi-sign-out"
-          [label]="'quiz.result.logout' | lang"
-          (onClick)="logout.emit()"
-        />
+        <app-stage-exit [primary]="true" />
         <span class="text-xs text-surface-500">{{ 'quiz.result.logout-hint' | lang }}</span>
       </div>
     </section>
@@ -85,7 +81,6 @@ export class QuizResultComponent {
   /** `null` — результат недоступен. */
   readonly result = input<TestResult | null>(null);
   readonly timeUp = input(false);
-  readonly logout = output<void>();
 
   protected readonly summary = computed(() => {
     const result = this.result();

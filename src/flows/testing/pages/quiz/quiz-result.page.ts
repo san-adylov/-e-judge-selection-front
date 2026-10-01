@@ -10,6 +10,7 @@ import { Skeleton } from 'primeng/skeleton';
 import { TestsApi } from '@domain/api/tests.api';
 import { QUIZ_ERRORS, quizAccess, type TestResult } from '@features/quiz/quiz.logic';
 import { QuizResultComponent } from '@features/quiz/quiz-result.component';
+import { StageExitComponent } from '@features/stage-timer/stage-exit.component';
 import { apiErrorOf } from '@shared/api/api-error';
 import { skipErrorToast } from '@shared/api/http-context';
 import { homeUrl } from '@shared/auth/areas';
@@ -23,7 +24,7 @@ import { resultStateFor } from './quiz-page.logic';
  */
 @Component({
   selector: 'app-quiz-result-page',
-  imports: [LangPipe, Button, Message, Skeleton, QuizResultComponent],
+  imports: [LangPipe, Button, Message, Skeleton, QuizResultComponent, StageExitComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="mx-auto flex w-full max-w-3xl flex-col gap-4">
@@ -42,17 +43,11 @@ import { resultStateFor } from './quiz-page.logic';
           <p-message severity="error" [text]="error() || ('quiz.result.load-error' | lang)" />
           <div class="flex flex-col gap-2 tablet:flex-row">
             <p-button icon="pi pi-refresh" [label]="'quiz.error.retry' | lang" (onClick)="load()" />
-            <p-button
-              icon="pi pi-sign-out"
-              severity="secondary"
-              [outlined]="true"
-              [label]="'quiz.result.logout' | lang"
-              (onClick)="logout()"
-            />
+            <app-stage-exit />
           </div>
         </section>
       } @else {
-        <app-quiz-result [result]="result()" [timeUp]="timeUp()" (logout)="logout()" />
+        <app-quiz-result [result]="result()" [timeUp]="timeUp()" />
       }
     </div>
   `,
@@ -123,9 +118,5 @@ export default class QuizResultPage implements OnInit {
           this.loading.set(false);
         },
       });
-  }
-
-  protected logout(): void {
-    void this.session.logout();
   }
 }

@@ -107,5 +107,18 @@
     "OPENED": "Ачылган",
     "APPROVED": "Бекитилген",
     "DECLINED": "Четке кагылган"
+  },
+  "meetingType": {
+    "OPEN_COMPETITION": "Конкурсту ачуу",
+    "DOCUMENT_REVIEW": "Документтер боюнча киргизүү",
+    "CALENDAR_APPROVAL": "Календардык планды бекитүү",
+    "INTERVIEW": "Маектешүү",
+    "COMPLAINT_REVIEW": "Даттанууну кароо",
+    "CLOSE_COMPETITION": "Конкурсту жабуу",
+    "JUDGE_DOCUMENT_REVIEW": "Судьянын документтери",
+    "PROFESSIONAL_ASSESSMENT_APPROVAL": "Кесиптик бааны бекитүү",
+    "JUDGE_INTERVIEW": "Судья менен маектешүү",
+    "CREATE_VACANCY": "Бош орунду жарыялоо",
+    "CANDIDATE_APPROVAL": "Талапкерди бекитүү"
   }
 }

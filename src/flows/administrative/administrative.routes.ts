@@ -23,60 +23,52 @@ export const ADMINISTRATIVE_ROUTES: Routes = [
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', title: 'shell.nav.dashboard', loadComponent: () => import('./pages/dashboard.page') },
-      screen({
+      {
         path: 'contests',
         title: 'shell.nav.contests',
-        access: 'STAFF',
-        actions: 'изменение — SECRETARY, создание и удаление — CHAIRMAN',
-        api: ['GET /contest/all', 'GET /contest?status', 'POST /contest/create-name'],
-      }),
-      screen({
+        loadComponent: () => import('./pages/contests/contests.page'),
+      },
+      {
+        path: 'contests/:id/edit',
+        title: 'shell.nav.contests',
+        canMatch: [access('SECRETARY')],
+        loadComponent: () => import('./pages/contests/contest-edit.page'),
+      },
+      {
         path: 'contests/:id',
         title: 'shell.nav.contests',
-        access: 'STAFF',
-        actions: 'изменение — SECRETARY, создание и удаление — CHAIRMAN',
-        api: [
-          'GET /contest/{id}',
-          'GET|PUT /contest/steps/{id}',
-          'PUT /contest/{id}/stage-window/{stage}',
-          'POST /contest/{id}/publish',
-          'DELETE /contest/{id}',
-        ],
-      }),
-      screen({
+        loadComponent: () => import('./pages/contests/contest-detail.page'),
+      },
+      {
         path: 'applications',
         title: 'shell.nav.applications',
-        access: 'COUNCIL',
-        actions: 'список секретаря — SECRETARY, свои доклады — BOARD',
-        api: [
-          'GET /contest-application/by-contest/{id}',
-          'GET /contest-application/for-secretary',
-          'GET /contest-application/my-reporting',
-          'PUT /contest-application/register/{id}',
-          'PUT /contest-application/returned-for-correction/{id}',
-          'PUT /contest-application/assign-board-member/{id}',
-          'PATCH /contest-application/{id}/ready',
-        ],
-      }),
-      screen({
+        canMatch: [access('COUNCIL')],
+        loadComponent: () => import('./pages/applications/applications.page'),
+      },
+      {
+        path: 'applications/:id',
+        title: 'shell.nav.applications',
+        canMatch: [access('COUNCIL')],
+        loadComponent: () => import('./pages/applications/application-detail.page'),
+      },
+      {
         path: 'document-assessment',
         title: 'shell.nav.document-assessment',
-        access: 'COUNCIL',
-        actions: 'оценка — BOARD',
-        api: ['GET|PUT /document-assessment', 'GET /document-assessment/summary'],
-      }),
-      screen({
+        canMatch: [access('COUNCIL')],
+        loadComponent: () => import('./pages/assessment/document-assessment.page'),
+      },
+      {
         path: 'essay-review',
         title: 'shell.nav.essay-review',
-        access: 'BOARD',
-        api: ['GET /essay/reply', 'GET /essay/reply/progress', 'PUT /essay/reply/{id}/score'],
-      }),
-      screen({
+        canMatch: [access('BOARD')],
+        loadComponent: () => import('./pages/essay-review/essay-review.page'),
+      },
+      {
         path: 'interviews',
         title: 'shell.nav.interviews',
-        access: 'BOARD',
-        api: ['GET /interviews', 'PATCH /interviews/assessment', 'GET /interviews/my'],
-      }),
+        canMatch: [access('BOARD')],
+        loadComponent: () => import('./pages/interviews/interviews.page'),
+      },
       screen({
         path: 'meetings',
         title: 'shell.nav.meetings',
@@ -172,16 +164,11 @@ export const ADMINISTRATIVE_ROUTES: Routes = [
           'POST /active-judge-confirmations/{id}/review|approve|reject',
         ],
       }),
-      screen({
+      {
         path: 'candidates/:userId',
         title: 'shell.nav.candidate',
-        access: 'STAFF',
-        api: [
-          'GET /candidate/profile/{userId}/full',
-          'POST /candidate/profile/{userId}/presentation',
-          'GET /candidate/{userId}/ban-status',
-        ],
-      }),
+        loadComponent: () => import('./pages/candidates/candidate.page'),
+      },
       screen({
         path: 'tests',
         title: 'shell.nav.tests',

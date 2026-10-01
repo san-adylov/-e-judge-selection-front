@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { LangPipe } from '@reforgium/presentia';
-import { Button } from 'primeng/button';
 
+import { StageExitComponent } from '@features/stage-timer/stage-exit.component';
 import { ServerDateTimePipe } from '@shared/lib/format.pipes';
 
 import { EssayWorkStore } from './essay-work.store';
@@ -12,7 +12,7 @@ import { EssayWorkStore } from './essay-work.store';
  */
 @Component({
   selector: 'app-essay-result',
-  imports: [LangPipe, Button, ServerDateTimePipe],
+  imports: [LangPipe, ServerDateTimePipe, StageExitComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section
@@ -50,31 +50,13 @@ import { EssayWorkStore } from './essay-work.store';
 
       <p class="m-0 max-w-xl text-sm text-surface-500">{{ 'essay.result.logout-hint' | lang }}</p>
 
-      <p-button
-        icon="pi pi-sign-out"
-        styleClass="w-full tablet:w-auto"
-        class="w-full tablet:w-auto"
-        [label]="'essay.result.logout' | lang"
-        [loading]="leaving()"
-        (onClick)="logout()"
-      />
+      <app-stage-exit [primary]="true" (exiting)="store.discardDraft()" />
     </section>
   `,
 })
 export class EssayResultComponent {
   protected readonly store = inject(EssayWorkStore);
 
-  protected readonly leaving = signal(false);
   protected readonly done = computed(() => this.store.phase() === 'done');
   protected readonly auto = computed(() => this.store.finishedBy() === 'auto');
-
-  protected async logout(): Promise<void> {
-    this.leaving.set(true);
-
-    try {
-      await this.store.logout();
-    } finally {
-      this.leaving.set(false);
-    }
-  }
 }

@@ -1,7 +1,7 @@
 <div
   class="sticky top-16 z-10 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-surface-200 bg-surface-0 p-3 shadow-sm tablet:p-4"
 >
-  <app-essay-timer [seconds]="store.remaining()" [level]="store.level()" />
+  <app-stage-timer [seconds]="store.remaining()" (warn)="onWarn($event)" />
 
   <p class="m-0 min-w-0 flex-1 text-xs text-surface-500" aria-live="polite" aria-atomic="true">
     @if (store.saveFailed()) {
@@ -30,7 +30,7 @@
   <p-message severity="info" icon="pi pi-spin pi-spinner" [text]="'essay.submit.sending' | lang" />
 } @else if (store.level() !== 'normal') {
   <p-message
-    [severity]="store.level() === 'danger' ? 'error' : 'warn'"
+    [severity]="store.level() === 'critical' ? 'error' : 'warn'"
     [text]="'essay.timer.banner-' + store.level() | lang: { seconds: autoSubmitSeconds }"
   />
 }
@@ -62,7 +62,7 @@
       [id]="'essay-answer-' + i"
       [autoResize]="true"
       [readOnly]="store.readonly()"
-      [value]="store.answers()[i] ?? ''"
+      [value]="store.answers()[i]"
       [placeholder]="'essay.writing.placeholder' | lang"
       [attr.aria-describedby]="'essay-count-' + i"
       (input)="onInput(i, $event)"
@@ -72,7 +72,7 @@
     ></textarea>
 
     <p [id]="'essay-count-' + i" class="m-0 text-xs text-surface-500 tabular-nums">
-      {{ 'essay.writing.count' | lang: { words: stats()[i]?.words ?? 0, chars: stats()[i]?.chars ?? 0 } }}
+      {{ 'essay.writing.count' | lang: { words: stats()[i].words, chars: stats()[i].chars } }}
     </p>
   </section>
 }

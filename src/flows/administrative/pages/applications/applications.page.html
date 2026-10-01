@@ -1,0 +1,90 @@
+<app-page-header title="staff-applications.title" subtitle="staff-applications.subtitle" />
+
+<div class="mb-4 flex flex-col gap-3 desktop-s:flex-row desktop-s:items-center">
+  <p-select
+    class="w-full desktop-s:w-96"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [filter]="true"
+    [options]="contestOptions()"
+    [loading]="contestsLoading()"
+    [placeholder]="'staff-applications.filter.contest' | lang"
+    [ariaLabel]="'staff-applications.filter.contest' | lang"
+    [ngModel]="selectedContestId()"
+    (ngModelChange)="setContest($event)"
+  />
+  @if (canReport()) {
+    <p-selectbutton
+      optionLabel="label"
+      optionValue="value"
+      [options]="modeOptions()"
+      [allowEmpty]="false"
+      [ngModel]="selectedMode()"
+      (ngModelChange)="setMode($event)"
+    />
+  }
+  @if (selectedMode() === 'all') {
+    <p-multiselect
+      class="w-full desktop-s:w-96"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      display="chip"
+      [maxSelectedLabels]="2"
+      [selectedItemsLabel]="'staff-applications.filter.statuses-selected' | lang"
+      [options]="statusOptions()"
+      [placeholder]="'staff-applications.filter.statuses' | lang"
+      [ariaLabel]="'staff-applications.filter.statuses' | lang"
+      [ngModel]="statuses()"
+      (ngModelChange)="setStatuses($event)"
+    />
+  }
+</div>
+
+@if (selectedContestId() === null) {
+  <section class="flex flex-col items-center gap-2 rounded-xl border border-surface-200 bg-surface-0 p-8 text-center">
+    <i class="pi pi-megaphone text-3xl text-surface-400" aria-hidden="true"></i>
+    <p class="m-0 text-surface-600">{{ 'staff-applications.select-contest' | lang }}</p>
+  </section>
+} @else {
+  <div class="rounded-xl border border-surface-200 bg-surface-0 p-2 tablet:p-4">
+    <app-data-table
+      [rows]="pageRows()"
+      [columns]="columns()"
+      [loading]="loading()"
+      [total]="total()"
+      [page]="page()"
+      [size]="size()"
+      emptyText="staff-applications.empty"
+      (pageChange)="onPage($event)"
+      (rowClick)="open($event)"
+    />
+  </div>
+}
+
+<ng-template #candidateCell let-row="row">
+  <a class="font-medium text-primary no-underline hover:underline" [routerLink]="[baseUrl, row.id]">
+    {{ candidateName(row.candidateId) }}
+  </a>
+</ng-template>
+<ng-template #statusCell let-row="row">
+  <app-status-tag kind="application" [value]="row.status" />
+</ng-template>
+<ng-template #reporterCell let-row="row">
+  @if (row.reporterId) {
+    <span class="inline-flex items-center gap-1.5">
+      <i
+        class="pi text-xs"
+        aria-hidden="true"
+        [class.pi-check-circle]="row.reporterReady"
+        [class.text-green-600]="row.reporterReady"
+        [class.pi-circle]="!row.reporterReady"
+        [class.text-surface-400]="!row.reporterReady"
+      ></i>
+      <span class="truncate">{{ reporterName(row.reporterId) }}</span>
+    </span>
+  } @else {
+    <span class="text-surface-400">—</span>
+  }
+</ng-template>

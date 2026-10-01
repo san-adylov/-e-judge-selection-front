@@ -15,7 +15,8 @@ export type StatusKind =
   | 'complaintType'
   | 'judgeApplication'
   | 'judgeConfirmation'
-  | 'meeting';
+  | 'meeting'
+  | 'meetingType';
 
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 

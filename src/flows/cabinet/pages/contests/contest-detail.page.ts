@@ -20,14 +20,13 @@ import { actionFor, NO_PARTICIPATION, type Participation, serverToday } from '@f
 import { ContestActionButtonComponent } from '@features/contest-card/contest-action-button.component';
 import { ContestApplyService } from '@features/contest-card/contest-apply.service';
 import { ContestProfileHintComponent } from '@features/contest-card/profile-hint.component';
+import { ContestAnnouncementComponent } from '@features/contest-info/contest-announcement.component';
+import { ContestRequirementsComponent } from '@features/contest-info/contest-requirements.component';
+import { ContestScheduleComponent } from '@features/contest-info/contest-schedule.component';
 import { skipErrorToast } from '@shared/api/http-context';
 import { LocalDatePipe } from '@shared/lib/format.pipes';
 import { SafeHtmlPipe } from '@shared/lib/safe-html.pipe';
 import { StatusTagComponent } from '@shared/ui/status-tag.component';
-
-import { ContestAnnouncementComponent } from './contest-announcement.component';
-import { ContestRequirementsComponent } from './contest-requirements.component';
-import { ContestScheduleComponent } from './contest-schedule.component';
 
 type Contest = Schemas['ContestResponse'];
 type Step = Schemas['ContestStepResponse'];
